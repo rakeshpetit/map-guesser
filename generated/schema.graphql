@@ -10,6 +10,7 @@ scalar DateTime
 type Mutation {
   createDraft(authorEmail: String, content: String, title: String!): Post
   createDraftQuiz(authorEmail: String, title: String!): Quiz
+  createQuestion(quizId: String, title: String!): Question
   deletePost(postId: String): Post
   deleteQuiz(quizId: String): Quiz
   publish(postId: String): Post
@@ -35,10 +36,17 @@ type Query {
   quizes: [Quiz]
 }
 
+type Question {
+  id: Int
+  quiz: Quiz
+  title: String
+}
+
 type Quiz {
   author: User
   id: Int
   published: Boolean
+  questions: [Question]
   title: String
 }
 

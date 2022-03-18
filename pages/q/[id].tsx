@@ -98,6 +98,7 @@ function Post() {
         >
           Delete
         </button>
+        <h3>Questions</h3>
       </div>
       <style jsx>{`
         .page {
