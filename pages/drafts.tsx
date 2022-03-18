@@ -5,10 +5,9 @@ import { useQuery } from "@apollo/client"
 
 const DraftsQuery = gql`
   query DraftsQuery {
-    drafts {
+    draftQuizes {
       id
       title
-      content
       published
       author {
         id
@@ -18,23 +17,26 @@ const DraftsQuery = gql`
   }
 `
 
-const Post = ({ post }) => (
-  <Link href="/p/[id]" as={`/p/${post.id}`}>
-    <a>
-      <h2>{post.title}</h2>
-      <small>By {post.author ? post.author.name : "Unknown Author"}</small>
-      <p>{post.content}</p>
-      <style jsx>{`
-        a {
-          text-decoration: none;
-          color: inherit;
-          padding: 2rem;
-          display: block;
-        }
-      `}</style>
-    </a>
-  </Link>
-)
+const Post = ({ post }) => {
+  console.log("po", post)
+  return (
+    <Link href="/q/[id]" as={`/q/${post.id}`}>
+      <a>
+        <h2>{post.title}</h2>
+        <small>By {post.author ? post.author.name : "Unknown Author"}</small>
+        <p>{post.content}</p>
+        <style jsx>{`
+          a {
+            text-decoration: none;
+            color: inherit;
+            padding: 2rem;
+            display: block;
+          }
+        `}</style>
+      </a>
+    </Link>
+  )
+}
 
 const Drafts = () => {
   const { loading, error, data } = useQuery(DraftsQuery, {
@@ -53,7 +55,7 @@ const Drafts = () => {
       <div className="page">
         <h1>Drafts</h1>
         <main>
-          {data.drafts.map(post => (
+          {data.draftQuizes.map(post => (
             <div key={post.id} className="post">
               <Post post={post} />
             </div>

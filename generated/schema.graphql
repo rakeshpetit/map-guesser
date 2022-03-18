@@ -9,8 +9,11 @@ scalar DateTime
 
 type Mutation {
   createDraft(authorEmail: String, content: String, title: String!): Post
+  createDraftQuiz(authorEmail: String, title: String!): Quiz
   deletePost(postId: String): Post
+  deleteQuiz(quizId: String): Quiz
   publish(postId: String): Post
+  publishQuiz(quizId: String): Quiz
   signupUser(email: String!, name: String): User
 }
 
@@ -23,10 +26,20 @@ type Post {
 }
 
 type Query {
+  draftQuizes: [Quiz]
   drafts: [Post]
   feed: [Post]
   filterPosts(searchString: String): [Post]
   post(postId: String!): Post
+  quiz(quizId: String!): Quiz
+  quizes: [Quiz]
+}
+
+type Quiz {
+  author: User
+  id: Int
+  published: Boolean
+  title: String
 }
 
 type User {

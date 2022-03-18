@@ -3,12 +3,11 @@ import Link from "next/link"
 import gql from "graphql-tag"
 import { useQuery } from "@apollo/client"
 
-const FeedQuery = gql`
-  query FeedQuery {
-    feed {
+const QuizesQuery = gql`
+  query Quizes {
+    quizes {
       id
       title
-      content
       published
       author {
         id
@@ -18,26 +17,28 @@ const FeedQuery = gql`
   }
 `
 
-const Post = ({ post }) => (
-  <Link href="/p/[id]" as={`/p/${post.id}`}>
-    <a>
-      <h2>{post.title}</h2>
-      <small>By {post.author.name}</small>
-      <p>{post.content}</p>
-      <style jsx>{`
-        a {
-          text-decoration: none;
-          color: inherit;
-          padding: 2rem;
-          display: block;
-        }
-      `}</style>
-    </a>
-  </Link>
-)
+const Quiz = ({ quiz }) => {
+  console.log("po", quiz)
+  return (
+    <Link href="/q/[id]" as={`/q/${quiz.id}`}>
+      <a>
+        <h2>{quiz.title}</h2>
+        <small>By {quiz.author ? quiz.author.name : "Unknown Author"}</small>
+        <style jsx>{`
+          a {
+            text-decoration: none;
+            color: inherit;
+            padding: 2rem;
+            display: block;
+          }
+        `}</style>
+      </a>
+    </Link>
+  )
+}
 
-const Blog = () => {
-  const { loading, error, data } = useQuery(FeedQuery, {
+const Quizes = () => {
+  const { loading, error, data } = useQuery(QuizesQuery, {
     fetchPolicy: "cache-and-network",
   })
 
@@ -51,11 +52,11 @@ const Blog = () => {
   return (
     <Layout>
       <div className="page">
-        <h1>Welcome to LPII Quiz</h1>
+        <h1>Quizes</h1>
         <main>
-          {data.feed.map(post => (
-            <div key={post.id} className="post">
-              <Post post={post} />
+          {data.quizes.map(quiz => (
+            <div key={quiz.id} className="post">
+              <Quiz quiz={quiz} />
             </div>
           ))}
         </main>
@@ -78,4 +79,4 @@ const Blog = () => {
   )
 }
 
-export default Blog
+export default Quizes
