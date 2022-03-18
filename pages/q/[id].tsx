@@ -47,7 +47,6 @@ const DeleteQuizMutation = gql`
 
 function Post() {
   const quizId = useRouter().query.id
-  console.log("po", quizId)
   const { loading, error, data } = useQuery(QuizQuery, {
     variables: { quizId },
   })
@@ -56,15 +55,11 @@ function Post() {
   const [deleteQuiz] = useMutation(DeleteQuizMutation)
 
   if (loading) {
-    console.log("loading")
     return <div>Loading ...</div>
   }
   if (error) {
-    console.log("error")
     return <div>Error: {error.message}</div>
   }
-
-  console.log(`response`, data)
 
   let title = data.quiz.title
   if (!data.quiz.published) {

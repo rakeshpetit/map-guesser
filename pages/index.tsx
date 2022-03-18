@@ -18,7 +18,6 @@ const QuizesQuery = gql`
 `
 
 const Quiz = ({ quiz }) => {
-  console.log("po", quiz)
   return (
     <Link href="/q/[id]" as={`/q/${quiz.id}`}>
       <a>

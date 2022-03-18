@@ -18,7 +18,6 @@ const DraftsQuery = gql`
 `
 
 const Post = ({ post }) => {
-  console.log("po", post)
   return (
     <Link href="/q/[id]" as={`/q/${post.id}`}>
       <a>
