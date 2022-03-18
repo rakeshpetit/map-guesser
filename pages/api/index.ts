@@ -67,6 +67,32 @@ const Quiz = objectType({
           })
           .author(),
     })
+    t.list.field("questions", {
+      type: "Question",
+      resolve: parent =>
+        prisma.quiz
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .questions(),
+    })
+  },
+})
+
+const Question = objectType({
+  name: "Question",
+  definition(t) {
+    t.int("id")
+    t.string("title")
+    t.nullable.field("quiz", {
+      type: "Quiz",
+      resolve: parent =>
+        prisma.question
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .quiz(),
+    })
   },
 })
 
@@ -260,11 +286,41 @@ const Mutation = objectType({
         })
       },
     })
+
+    t.field("createQuestion", {
+      type: "Question",
+      args: {
+        quizId: stringArg(),
+        title: nonNull(stringArg()),
+      },
+      resolve: (_, { title, quizId }, ctx) => {
+        return prisma.question.create({
+          data: {
+            title,
+            quiz: {
+              connect: { id: Number(quizId) },
+            },
+          },
+        })
+      },
+    })
+
+    t.nullable.field("deleteQuestion", {
+      type: "Question",
+      args: {
+        questionId: stringArg(),
+      },
+      resolve: (_, { questionId }, ctx) => {
+        return prisma.question.delete({
+          where: { id: Number(questionId) },
+        })
+      },
+    })
   },
 })
 
 export const schema = makeSchema({
-  types: [Query, Mutation, Post, User, Quiz, GQLDate],
+  types: [Query, Mutation, Post, User, Quiz, Question, GQLDate],
   outputs: {
     typegen: path.join(process.cwd(), "generated/nexus-typegen.ts"),
     schema: path.join(process.cwd(), "generated/schema.graphql"),
