@@ -1,6 +1,6 @@
-import { ApolloServer } from 'apollo-server-micro'
-import { DateTimeResolver } from 'graphql-scalars'
-import { NextApiHandler } from 'next'
+import { ApolloServer } from "apollo-server-micro"
+import { DateTimeResolver } from "graphql-scalars"
+import { NextApiHandler } from "next"
 import {
   asNexusMethod,
   makeSchema,
@@ -8,22 +8,22 @@ import {
   nullable,
   objectType,
   stringArg,
-} from 'nexus'
-import path from 'path'
-import cors from 'micro-cors'
-import prisma from '../../lib/prisma'
+} from "nexus"
+import path from "path"
+import cors from "micro-cors"
+import prisma from "../../lib/prisma"
 
-export const GQLDate = asNexusMethod(DateTimeResolver, 'date')
+export const GQLDate = asNexusMethod(DateTimeResolver, "date")
 
 const User = objectType({
-  name: 'User',
+  name: "User",
   definition(t) {
-    t.int('id')
-    t.string('name')
-    t.string('email')
-    t.list.field('posts', {
-      type: 'Post',
-      resolve: (parent) =>
+    t.int("id")
+    t.string("name")
+    t.string("email")
+    t.list.field("posts", {
+      type: "Post",
+      resolve: parent =>
         prisma.user
           .findUnique({
             where: { id: Number(parent.id) },
@@ -34,15 +34,15 @@ const User = objectType({
 })
 
 const Post = objectType({
-  name: 'Post',
+  name: "Post",
   definition(t) {
-    t.int('id')
-    t.string('title')
-    t.nullable.string('content')
-    t.boolean('published')
-    t.nullable.field('author', {
-      type: 'User',
-      resolve: (parent) =>
+    t.int("id")
+    t.string("title")
+    t.nullable.string("content")
+    t.boolean("published")
+    t.nullable.field("author", {
+      type: "User",
+      resolve: parent =>
         prisma.post
           .findUnique({
             where: { id: Number(parent.id) },
@@ -52,11 +52,29 @@ const Post = objectType({
   },
 })
 
-const Query = objectType({
-  name: 'Query',
+const Quiz = objectType({
+  name: "Quiz",
   definition(t) {
-    t.field('post', {
-      type: 'Post',
+    t.int("id")
+    t.string("title")
+    t.boolean("published")
+    t.nullable.field("author", {
+      type: "User",
+      resolve: parent =>
+        prisma.quiz
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .author(),
+    })
+  },
+})
+
+const Query = objectType({
+  name: "Query",
+  definition(t) {
+    t.field("post", {
+      type: "Post",
       args: {
         postId: nonNull(stringArg()),
       },
@@ -67,8 +85,8 @@ const Query = objectType({
       },
     })
 
-    t.list.field('feed', {
-      type: 'Post',
+    t.list.field("feed", {
+      type: "Post",
       resolve: (_parent, _args) => {
         return prisma.post.findMany({
           where: { published: true },
@@ -76,8 +94,8 @@ const Query = objectType({
       },
     })
 
-    t.list.field('drafts', {
-      type: 'Post',
+    t.list.field("drafts", {
+      type: "Post",
       resolve: (_parent, _args, ctx) => {
         return prisma.post.findMany({
           where: { published: false },
@@ -85,8 +103,8 @@ const Query = objectType({
       },
     })
 
-    t.list.field('filterPosts', {
-      type: 'Post',
+    t.list.field("filterPosts", {
+      type: "Post",
       args: {
         searchString: nullable(stringArg()),
       },
@@ -101,14 +119,44 @@ const Query = objectType({
         })
       },
     })
+
+    t.list.field("draftQuizes", {
+      type: "Quiz",
+      resolve: (_parent, _args, ctx) => {
+        return prisma.quiz.findMany({
+          where: { published: false },
+        })
+      },
+    })
+
+    t.list.field("quizes", {
+      type: "Quiz",
+      resolve: (_parent, _args) => {
+        return prisma.quiz.findMany({
+          where: { published: true },
+        })
+      },
+    })
+
+    t.field("quiz", {
+      type: "Quiz",
+      args: {
+        quizId: nonNull(stringArg()),
+      },
+      resolve: (_, args) => {
+        return prisma.quiz.findUnique({
+          where: { id: Number(args.quizId) },
+        })
+      },
+    })
   },
 })
 
 const Mutation = objectType({
-  name: 'Mutation',
+  name: "Mutation",
   definition(t) {
-    t.field('signupUser', {
-      type: 'User',
+    t.field("signupUser", {
+      type: "User",
       args: {
         name: stringArg(),
         email: nonNull(stringArg()),
@@ -123,8 +171,8 @@ const Mutation = objectType({
       },
     })
 
-    t.nullable.field('deletePost', {
-      type: 'Post',
+    t.nullable.field("deletePost", {
+      type: "Post",
       args: {
         postId: stringArg(),
       },
@@ -135,8 +183,8 @@ const Mutation = objectType({
       },
     })
 
-    t.field('createDraft', {
-      type: 'Post',
+    t.field("createDraft", {
+      type: "Post",
       args: {
         title: nonNull(stringArg()),
         content: stringArg(),
@@ -156,8 +204,8 @@ const Mutation = objectType({
       },
     })
 
-    t.nullable.field('publish', {
-      type: 'Post',
+    t.nullable.field("publish", {
+      type: "Post",
       args: {
         postId: stringArg(),
       },
@@ -168,14 +216,58 @@ const Mutation = objectType({
         })
       },
     })
+
+    t.field("createDraftQuiz", {
+      type: "Quiz",
+      args: {
+        title: nonNull(stringArg()),
+        authorEmail: stringArg(),
+      },
+      resolve: (_, { title, authorEmail }, ctx) => {
+        return prisma.quiz.create({
+          data: {
+            title,
+            published: false,
+            author: {
+              connect: { email: authorEmail },
+            },
+          },
+        })
+      },
+    })
+
+    t.nullable.field("publishQuiz", {
+      type: "Quiz",
+      args: {
+        quizId: stringArg(),
+      },
+      resolve: (_, { quizId }, ctx) => {
+        return prisma.quiz.update({
+          where: { id: Number(quizId) },
+          data: { published: true },
+        })
+      },
+    })
+
+    t.nullable.field("deleteQuiz", {
+      type: "Quiz",
+      args: {
+        quizId: stringArg(),
+      },
+      resolve: (_, { quizId }, ctx) => {
+        return prisma.quiz.delete({
+          where: { id: Number(quizId) },
+        })
+      },
+    })
   },
 })
 
 export const schema = makeSchema({
-  types: [Query, Mutation, Post, User, GQLDate],
+  types: [Query, Mutation, Post, User, Quiz, GQLDate],
   outputs: {
-    typegen: path.join(process.cwd(), 'generated/nexus-typegen.ts'),
-    schema: path.join(process.cwd(), 'generated/schema.graphql'),
+    typegen: path.join(process.cwd(), "generated/nexus-typegen.ts"),
+    schema: path.join(process.cwd(), "generated/schema.graphql"),
   },
 })
 
@@ -194,7 +286,7 @@ async function getApolloServerHandler() {
     await apolloServer.start()
 
     apolloServerHandler = apolloServer.createHandler({
-      path: '/api',
+      path: "/api",
     })
   }
 
@@ -204,7 +296,7 @@ async function getApolloServerHandler() {
 const handler: NextApiHandler = async (req, res) => {
   const apolloServerHandler = await getApolloServerHandler()
 
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     res.end()
     return
   }

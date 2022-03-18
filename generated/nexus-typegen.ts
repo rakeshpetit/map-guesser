@@ -51,6 +51,11 @@ export interface NexusGenObjects {
     title?: string | null; // String
   }
   Query: {};
+  Quiz: { // root type
+    id?: number | null; // Int
+    published?: boolean | null; // Boolean
+    title?: string | null; // String
+  }
   User: { // root type
     email?: string | null; // String
     id?: number | null; // Int
@@ -71,8 +76,11 @@ export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 export interface NexusGenFieldTypes {
   Mutation: { // field return type
     createDraft: NexusGenRootTypes['Post'] | null; // Post
+    createDraftQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     deletePost: NexusGenRootTypes['Post'] | null; // Post
+    deleteQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     publish: NexusGenRootTypes['Post'] | null; // Post
+    publishQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     signupUser: NexusGenRootTypes['User'] | null; // User
   }
   Post: { // field return type
@@ -83,10 +91,19 @@ export interface NexusGenFieldTypes {
     title: string | null; // String
   }
   Query: { // field return type
+    draftQuizes: Array<NexusGenRootTypes['Quiz'] | null> | null; // [Quiz]
     drafts: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
     feed: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
     filterPosts: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
     post: NexusGenRootTypes['Post'] | null; // Post
+    quiz: NexusGenRootTypes['Quiz'] | null; // Quiz
+    quizes: Array<NexusGenRootTypes['Quiz'] | null> | null; // [Quiz]
+  }
+  Quiz: { // field return type
+    author: NexusGenRootTypes['User'] | null; // User
+    id: number | null; // Int
+    published: boolean | null; // Boolean
+    title: string | null; // String
   }
   User: { // field return type
     email: string | null; // String
@@ -99,8 +116,11 @@ export interface NexusGenFieldTypes {
 export interface NexusGenFieldTypeNames {
   Mutation: { // field return type name
     createDraft: 'Post'
+    createDraftQuiz: 'Quiz'
     deletePost: 'Post'
+    deleteQuiz: 'Quiz'
     publish: 'Post'
+    publishQuiz: 'Quiz'
     signupUser: 'User'
   }
   Post: { // field return type name
@@ -111,10 +131,19 @@ export interface NexusGenFieldTypeNames {
     title: 'String'
   }
   Query: { // field return type name
+    draftQuizes: 'Quiz'
     drafts: 'Post'
     feed: 'Post'
     filterPosts: 'Post'
     post: 'Post'
+    quiz: 'Quiz'
+    quizes: 'Quiz'
+  }
+  Quiz: { // field return type name
+    author: 'User'
+    id: 'Int'
+    published: 'Boolean'
+    title: 'String'
   }
   User: { // field return type name
     email: 'String'
@@ -131,11 +160,21 @@ export interface NexusGenArgTypes {
       content?: string | null; // String
       title: string; // String!
     }
+    createDraftQuiz: { // args
+      authorEmail?: string | null; // String
+      title: string; // String!
+    }
     deletePost: { // args
       postId?: string | null; // String
     }
+    deleteQuiz: { // args
+      quizId?: string | null; // String
+    }
     publish: { // args
       postId?: string | null; // String
+    }
+    publishQuiz: { // args
+      quizId?: string | null; // String
     }
     signupUser: { // args
       email: string; // String!
@@ -148,6 +187,9 @@ export interface NexusGenArgTypes {
     }
     post: { // args
       postId: string; // String!
+    }
+    quiz: { // args
+      quizId: string; // String!
     }
   }
 }

@@ -4,16 +4,11 @@ import Router from "next/router"
 import gql from "graphql-tag"
 import { useMutation } from "@apollo/client"
 
-const CreateDraftMutation = gql`
-  mutation CreateDraftMutation(
-    $title: String!
-    $content: String
-    $authorEmail: String!
-  ) {
-    createDraft(title: $title, content: $content, authorEmail: $authorEmail) {
+const CreateDraftQuizMutation = gql`
+  mutation CreateDraftQuizMutation($title: String!, $authorEmail: String!) {
+    createDraftQuiz(title: $title, authorEmail: $authorEmail) {
       id
       title
-      content
       published
       author {
         id
@@ -25,52 +20,44 @@ const CreateDraftMutation = gql`
 
 function Draft(props) {
   const [title, setTitle] = useState("")
-  const [content, setContent] = useState("")
   const [authorEmail, setAuthorEmail] = useState("")
 
-  const [createDraft, { loading, error, data }] =
-    useMutation(CreateDraftMutation)
+  const [createDraftQuiz, { loading, error, data }] = useMutation(
+    CreateDraftQuizMutation
+  )
 
   return (
     <Layout>
       <div>
         <form
-          onSubmit={async (e) => {
+          onSubmit={async e => {
             e.preventDefault()
 
-            await createDraft({
+            await createDraftQuiz({
               variables: {
                 title,
-                content,
                 authorEmail,
               },
             })
             Router.push("/drafts")
           }}
         >
-          <h1>Create Draft</h1>
+          <h1>Create Quiz</h1>
           <input
             autoFocus
-            onChange={(e) => setTitle(e.target.value)}
+            onChange={e => setTitle(e.target.value)}
             placeholder="Title"
             type="text"
             value={title}
           />
           <input
-            onChange={(e) => setAuthorEmail(e.target.value)}
+            onChange={e => setAuthorEmail(e.target.value)}
             placeholder="Author (email adress)"
             type="text"
             value={authorEmail}
           />
-          <textarea
-            cols={50}
-            onChange={(e) => setContent(e.target.value)}
-            placeholder="Content"
-            rows={8}
-            value={content}
-          />
           <input
-            disabled={!content || !title || !authorEmail}
+            disabled={!title || !authorEmail}
             type="submit"
             value="Create"
           />

@@ -3,12 +3,11 @@ import Router, { useRouter } from "next/router"
 import gql from "graphql-tag"
 import { useQuery, useMutation } from "@apollo/client"
 
-const PostQuery = gql`
-  query PostQuery($postId: String!) {
-    post(postId: $postId) {
+const QuizQuery = gql`
+  query quizQuery($quizId: String!) {
+    quiz(quizId: $quizId) {
       id
       title
-      content
       published
       author {
         id
@@ -18,12 +17,11 @@ const PostQuery = gql`
   }
 `
 
-const PublishMutation = gql`
-  mutation PublishMutation($postId: String!) {
-    publish(postId: $postId) {
+const PublishQuizMutation = gql`
+  mutation PublishQuiz($quizId: String!) {
+    publishQuiz(quizId: $quizId) {
       id
       title
-      content
       published
       author {
         id
@@ -33,12 +31,11 @@ const PublishMutation = gql`
   }
 `
 
-const DeleteMutation = gql`
-  mutation DeleteMutation($postId: String!) {
-    deletePost(postId: $postId) {
+const DeleteQuizMutation = gql`
+  mutation DeleteQuizMutation($quizId: String!) {
+    deleteQuiz(quizId: $quizId) {
       id
       title
-      content
       published
       author {
         id
@@ -49,13 +46,14 @@ const DeleteMutation = gql`
 `
 
 function Post() {
-  const postId = useRouter().query.id
-  const { loading, error, data } = useQuery(PostQuery, {
-    variables: { postId },
+  const quizId = useRouter().query.id
+  console.log("po", quizId)
+  const { loading, error, data } = useQuery(QuizQuery, {
+    variables: { quizId },
   })
 
-  const [publish] = useMutation(PublishMutation)
-  const [deletePost] = useMutation(DeleteMutation)
+  const [publish] = useMutation(PublishQuizMutation)
+  const [deleteQuiz] = useMutation(DeleteQuizMutation)
 
   if (loading) {
     console.log("loading")
@@ -68,24 +66,23 @@ function Post() {
 
   console.log(`response`, data)
 
-  let title = data.post.title
-  if (!data.post.published) {
+  let title = data.quiz.title
+  if (!data.quiz.published) {
     title = `${title} (Draft)`
   }
 
-  const authorName = data.post.author ? data.post.author.name : "Unknown author"
+  const authorName = data.quiz.author ? data.quiz.author.name : "Unknown author"
   return (
     <Layout>
       <div>
         <h2>{title}</h2>
         <p>By {authorName}</p>
-        <p>{data.post.content}</p>
-        {!data.post.published && (
+        {!data.quiz.published && (
           <button
             onClick={async e => {
               await publish({
                 variables: {
-                  postId,
+                  quizId,
                 },
               })
               Router.push("/")
@@ -96,9 +93,9 @@ function Post() {
         )}
         <button
           onClick={async e => {
-            await deletePost({
+            await deleteQuiz({
               variables: {
-                postId,
+                quizId,
               },
             })
             Router.push("/")

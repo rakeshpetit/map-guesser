@@ -19,11 +19,11 @@ const Header = () => {
       <div className="left">
         <Link href="/">
           <a className="bold" data-active={isActive("/")}>
-            Blog
+            Quizes
           </a>
         </Link>
         <Link href="/drafts">
-          <a data-active={isActive("/drafts")}>Drafts</a>
+          <a data-active={isActive("/drafts")}>Draft Quizes</a>
         </Link>
       </div>
       <div className="right">
@@ -31,7 +31,7 @@ const Header = () => {
           <a data-active={isActive("/signup")}>Signup</a>
         </Link>
         <Link href="/create">
-          <a data-active={isActive("/create")}>+ Create draft</a>
+          <a data-active={isActive("/create")}>+ Create quiz</a>
         </Link>
       </div>
       <style jsx>{`
