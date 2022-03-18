@@ -38,7 +38,7 @@ const Quiz = ({ quiz }) => {
 
 const Quizes = () => {
   const { loading, error, data } = useQuery(QuizesQuery, {
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-first",
   })
 
   if (loading) {

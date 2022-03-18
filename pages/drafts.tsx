@@ -39,7 +39,7 @@ const Post = ({ post }) => {
 
 const Drafts = () => {
   const { loading, error, data } = useQuery(DraftsQuery, {
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-first",
   })
 
   if (loading) {
