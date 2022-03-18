@@ -70,6 +70,7 @@ const DeleteQuestionMutation = gql`
 
 function Questions({ quizId, questions }) {
   const [title, setTitle] = useState("")
+  const [deletingQuestionId, setDeletingQuestionId] = useState(null)
 
   const [createQuestion, { loading }] = useMutation(CreateQuestionMutation, {
     refetchQueries: [
@@ -120,13 +121,14 @@ function Questions({ quizId, questions }) {
         </div>
       )}
       {questions.map(question => {
-        return loadingDelete ? (
+        return loadingDelete && question.id === deletingQuestionId ? (
           <h4 key={question.id}>Deleting...</h4>
         ) : (
           <>
             <h4 key={question.id}>{question.title}</h4>
             <button
               onClick={async e => {
+                setDeletingQuestionId(question.id)
                 await deleteQuestion({
                   variables: {
                     questionId: `${question.id}`,
