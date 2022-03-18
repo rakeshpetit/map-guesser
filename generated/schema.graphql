@@ -12,6 +12,7 @@ type Mutation {
   createDraftQuiz(authorEmail: String, title: String!): Quiz
   createQuestion(quizId: String, title: String!): Question
   deletePost(postId: String): Post
+  deleteQuestion(questionId: String): Question
   deleteQuiz(quizId: String): Quiz
   publish(postId: String): Post
   publishQuiz(quizId: String): Quiz

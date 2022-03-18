@@ -83,6 +83,7 @@ export interface NexusGenFieldTypes {
     createDraftQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     createQuestion: NexusGenRootTypes['Question'] | null; // Question
     deletePost: NexusGenRootTypes['Post'] | null; // Post
+    deleteQuestion: NexusGenRootTypes['Question'] | null; // Question
     deleteQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     publish: NexusGenRootTypes['Post'] | null; // Post
     publishQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
@@ -130,6 +131,7 @@ export interface NexusGenFieldTypeNames {
     createDraftQuiz: 'Quiz'
     createQuestion: 'Question'
     deletePost: 'Post'
+    deleteQuestion: 'Question'
     deleteQuiz: 'Quiz'
     publish: 'Post'
     publishQuiz: 'Quiz'
@@ -188,6 +190,9 @@ export interface NexusGenArgTypes {
     }
     deletePost: { // args
       postId?: string | null; // String
+    }
+    deleteQuestion: { // args
+      questionId?: string | null; // String
     }
     deleteQuiz: { // args
       quizId?: string | null; // String

@@ -304,6 +304,18 @@ const Mutation = objectType({
         })
       },
     })
+
+    t.nullable.field("deleteQuestion", {
+      type: "Question",
+      args: {
+        questionId: stringArg(),
+      },
+      resolve: (_, { questionId }, ctx) => {
+        return prisma.question.delete({
+          where: { id: Number(questionId) },
+        })
+      },
+    })
   },
 })
 

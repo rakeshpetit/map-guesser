@@ -2,6 +2,7 @@ import Layout from "../../components/Layout"
 import Router, { useRouter } from "next/router"
 import gql from "graphql-tag"
 import { useQuery, useMutation } from "@apollo/client"
+import { useState } from "react"
 
 const QuizQuery = gql`
   query quizQuery($quizId: String!) {
@@ -12,6 +13,10 @@ const QuizQuery = gql`
       author {
         id
         name
+      }
+      questions {
+        id
+        title
       }
     }
   }
@@ -44,6 +49,99 @@ const DeleteQuizMutation = gql`
     }
   }
 `
+
+const CreateQuestionMutation = gql`
+  mutation CreateQuestion($title: String!, $quizId: String!) {
+    createQuestion(title: $title, quizId: $quizId) {
+      id
+      title
+    }
+  }
+`
+
+const DeleteQuestionMutation = gql`
+  mutation DeleteQuestionMutation($questionId: String!) {
+    deleteQuestion(questionId: $questionId) {
+      id
+      title
+    }
+  }
+`
+
+function Questions({ quizId, questions }) {
+  const [title, setTitle] = useState("")
+
+  const [createQuestion, { loading }] = useMutation(CreateQuestionMutation, {
+    refetchQueries: [
+      {
+        query: QuizQuery,
+        variables: { quizId: `${quizId}` },
+      },
+    ],
+  })
+
+  const [deleteQuestion, { loading: loadingDelete }] = useMutation(
+    DeleteQuestionMutation,
+    {
+      refetchQueries: [
+        {
+          query: QuizQuery,
+          variables: { quizId: `${quizId}` },
+        },
+      ],
+    }
+  )
+
+  return (
+    <>
+      <h3>Questions</h3>
+      {loading ? (
+        <h4>"Saving..."</h4>
+      ) : (
+        <div>
+          <input
+            autoFocus
+            onChange={e => setTitle(e.target.value)}
+            onKeyDown={async e => {
+              if (e.key === "Enter") {
+                await createQuestion({
+                  variables: {
+                    title,
+                    quizId: `${quizId}`,
+                  },
+                })
+                setTitle("")
+              }
+            }}
+            placeholder="Add question"
+            type="text"
+            value={title}
+          />
+        </div>
+      )}
+      {questions.map(question => {
+        return loadingDelete ? (
+          <h4 key={question.id}>Deleting...</h4>
+        ) : (
+          <>
+            <h4 key={question.id}>{question.title}</h4>
+            <button
+              onClick={async e => {
+                await deleteQuestion({
+                  variables: {
+                    questionId: `${question.id}`,
+                  },
+                })
+              }}
+            >
+              Delete
+            </button>
+          </>
+        )
+      })}
+    </>
+  )
+}
 
 function Post() {
   const quizId = useRouter().query.id
@@ -98,7 +196,9 @@ function Post() {
         >
           Delete
         </button>
-        <h3>Questions</h3>
+        {!data.quiz.published && (
+          <Questions quizId={data.quiz.id} questions={data.quiz.questions} />
+        )}
       </div>
       <style jsx>{`
         .page {
