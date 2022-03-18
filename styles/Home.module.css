@@ -45,6 +45,13 @@
   font-size: 4rem;
 }
 
+.mapGuesser {
+  color: rgb(0, 94, 255);
+  margin: 0;
+  line-height: 1.15;
+  font-size: 4rem;
+}
+
 .title,
 .description {
   text-align: center;
