@@ -1,6 +1,7 @@
 import gql from "graphql-tag"
 import { useMutation } from "@apollo/client"
 import { useState } from "react"
+import Choices from "./choices"
 
 const QuizQuery = gql`
   query quizQuery($quizId: String!) {
@@ -15,6 +16,10 @@ const QuizQuery = gql`
       questions {
         id
         title
+        choices {
+          id
+          name
+        }
       }
     }
   }
@@ -65,7 +70,7 @@ function Questions({ quizId, questions }) {
 
   return (
     <>
-      <h3>Questions</h3>
+      <h2>Questions</h2>
       {loading ? (
         <h4>"Saving..."</h4>
       ) : (
@@ -91,10 +96,11 @@ function Questions({ quizId, questions }) {
         </div>
       )}
       {questions.map(question => {
+        console.log("choices", question.choices)
         return loadingDelete && question.id === deletingQuestionId ? (
           <h4 key={question.id}>Deleting...</h4>
         ) : (
-          <>
+          <div className="question">
             <h4 key={question.id}>{question.title}</h4>
             <button
               onClick={async e => {
@@ -108,9 +114,30 @@ function Questions({ quizId, questions }) {
             >
               Delete
             </button>
-          </>
+            <Choices questionId={question.id} choices={question.choices} />
+          </div>
         )
       })}
+      <style jsx>{`
+        div.question {
+          display: block;
+          margin-top: 2rem;
+          margin-bottom: 2rem;
+          padding-top: 1rem;
+          background-color: #b1c6e4;
+        }
+        h2 {
+          display: block;
+        }
+        h4 {
+          display: inline;
+          padding-left: 1rem;
+          padding-right: 1rem;
+        }
+        button {
+          display: inline;
+        }
+      `}</style>
     </>
   )
 }

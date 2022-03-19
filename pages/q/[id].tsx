@@ -17,6 +17,10 @@ const QuizQuery = gql`
       questions {
         id
         title
+        choices {
+          id
+          name
+        }
       }
     }
   }
