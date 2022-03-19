@@ -84,7 +84,7 @@ function Choices({ questionId, choices }) {
           )
         })}
       {loading ? (
-        <h4>"Saving..."</h4>
+        <h4>Saving...</h4>
       ) : (
         <div className="addButton">
           <input

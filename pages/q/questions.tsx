@@ -72,7 +72,7 @@ function Questions({ quizId, questions }) {
     <>
       <h2>Questions</h2>
       {loading ? (
-        <h4>"Saving..."</h4>
+        <h4>Saving...</h4>
       ) : (
         <div>
           <input
@@ -95,29 +95,31 @@ function Questions({ quizId, questions }) {
           />
         </div>
       )}
-      {questions.map(question => {
-        console.log("choices", question.choices)
-        return loadingDelete && question.id === deletingQuestionId ? (
-          <h4 key={question.id}>Deleting...</h4>
-        ) : (
-          <div className="question">
-            <h4 key={question.id}>{question.title}</h4>
-            <button
-              onClick={async e => {
-                setDeletingQuestionId(question.id)
-                await deleteQuestion({
-                  variables: {
-                    questionId: `${question.id}`,
-                  },
-                })
-              }}
-            >
-              Delete
-            </button>
-            <Choices questionId={question.id} choices={question.choices} />
-          </div>
-        )
-      })}
+      {questions &&
+        questions.length > 0 &&
+        questions.map(question => {
+          console.log("choices", question.choices)
+          return loadingDelete && question.id === deletingQuestionId ? (
+            <h4 key={question.id}>Deleting...</h4>
+          ) : (
+            <div className="question">
+              <h4 key={question.id}>{question.title}</h4>
+              <button
+                onClick={async e => {
+                  setDeletingQuestionId(question.id)
+                  await deleteQuestion({
+                    variables: {
+                      questionId: `${question.id}`,
+                    },
+                  })
+                }}
+              >
+                Delete
+              </button>
+              <Choices questionId={question.id} choices={question.choices} />
+            </div>
+          )
+        })}
       <style jsx>{`
         div.question {
           display: block;
