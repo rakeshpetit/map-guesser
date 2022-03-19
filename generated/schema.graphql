@@ -2,15 +2,23 @@
 ### Do not make changes to this file directly
 
 
+type Choice {
+  id: Int
+  name: String
+  question: Question
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.
 """
 scalar DateTime
 
 type Mutation {
+  createChoice(name: String!, questionId: String): Choice
   createDraft(authorEmail: String, content: String, title: String!): Post
   createDraftQuiz(authorEmail: String, title: String!): Quiz
   createQuestion(quizId: String, title: String!): Question
+  deleteChoice(choiceId: String): Choice
   deletePost(postId: String): Post
   deleteQuestion(questionId: String): Question
   deleteQuiz(quizId: String): Quiz
@@ -33,11 +41,13 @@ type Query {
   feed: [Post]
   filterPosts(searchString: String): [Post]
   post(postId: String!): Post
+  question(questionId: String!): Question
   quiz(quizId: String!): Quiz
   quizes: [Quiz]
 }
 
 type Question {
+  choices: [Choice]
   id: Int
   quiz: Quiz
   title: String

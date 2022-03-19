@@ -93,6 +93,32 @@ const Question = objectType({
           })
           .quiz(),
     })
+    t.list.field("choices", {
+      type: "Choice",
+      resolve: parent =>
+        prisma.question
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .choices(),
+    })
+  },
+})
+
+const Choice = objectType({
+  name: "Choice",
+  definition(t) {
+    t.int("id")
+    t.string("name")
+    t.nullable.field("question", {
+      type: "Question",
+      resolve: parent =>
+        prisma.choice
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .question(),
+    })
   },
 })
 
@@ -172,6 +198,18 @@ const Query = objectType({
       resolve: (_, args) => {
         return prisma.quiz.findUnique({
           where: { id: Number(args.quizId) },
+        })
+      },
+    })
+
+    t.field("question", {
+      type: "Question",
+      args: {
+        questionId: nonNull(stringArg()),
+      },
+      resolve: (_, args) => {
+        return prisma.question.findUnique({
+          where: { id: Number(args.questionId) },
         })
       },
     })
@@ -316,11 +354,41 @@ const Mutation = objectType({
         })
       },
     })
+
+    t.field("createChoice", {
+      type: "Choice",
+      args: {
+        questionId: stringArg(),
+        name: nonNull(stringArg()),
+      },
+      resolve: (_, { questionId, name }, ctx) => {
+        return prisma.choice.create({
+          data: {
+            name,
+            question: {
+              connect: { id: Number(questionId) },
+            },
+          },
+        })
+      },
+    })
+
+    t.nullable.field("deleteChoice", {
+      type: "Choice",
+      args: {
+        choiceId: stringArg(),
+      },
+      resolve: (_, { choiceId }, ctx) => {
+        return prisma.choice.delete({
+          where: { id: Number(choiceId) },
+        })
+      },
+    })
   },
 })
 
 export const schema = makeSchema({
-  types: [Query, Mutation, Post, User, Quiz, Question, GQLDate],
+  types: [Query, Mutation, Post, User, Quiz, Question, Choice, GQLDate],
   outputs: {
     typegen: path.join(process.cwd(), "generated/nexus-typegen.ts"),
     schema: path.join(process.cwd(), "generated/schema.graphql"),

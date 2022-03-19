@@ -43,6 +43,10 @@ export interface NexusGenScalars {
 }
 
 export interface NexusGenObjects {
+  Choice: { // root type
+    id?: number | null; // Int
+    name?: string | null; // String
+  }
   Mutation: {};
   Post: { // root type
     content?: string | null; // String
@@ -78,10 +82,17 @@ export type NexusGenRootTypes = NexusGenObjects
 export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
+  Choice: { // field return type
+    id: number | null; // Int
+    name: string | null; // String
+    question: NexusGenRootTypes['Question'] | null; // Question
+  }
   Mutation: { // field return type
+    createChoice: NexusGenRootTypes['Choice'] | null; // Choice
     createDraft: NexusGenRootTypes['Post'] | null; // Post
     createDraftQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     createQuestion: NexusGenRootTypes['Question'] | null; // Question
+    deleteChoice: NexusGenRootTypes['Choice'] | null; // Choice
     deletePost: NexusGenRootTypes['Post'] | null; // Post
     deleteQuestion: NexusGenRootTypes['Question'] | null; // Question
     deleteQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
@@ -102,10 +113,12 @@ export interface NexusGenFieldTypes {
     feed: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
     filterPosts: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
     post: NexusGenRootTypes['Post'] | null; // Post
+    question: NexusGenRootTypes['Question'] | null; // Question
     quiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     quizes: Array<NexusGenRootTypes['Quiz'] | null> | null; // [Quiz]
   }
   Question: { // field return type
+    choices: Array<NexusGenRootTypes['Choice'] | null> | null; // [Choice]
     id: number | null; // Int
     quiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     title: string | null; // String
@@ -126,10 +139,17 @@ export interface NexusGenFieldTypes {
 }
 
 export interface NexusGenFieldTypeNames {
+  Choice: { // field return type name
+    id: 'Int'
+    name: 'String'
+    question: 'Question'
+  }
   Mutation: { // field return type name
+    createChoice: 'Choice'
     createDraft: 'Post'
     createDraftQuiz: 'Quiz'
     createQuestion: 'Question'
+    deleteChoice: 'Choice'
     deletePost: 'Post'
     deleteQuestion: 'Question'
     deleteQuiz: 'Quiz'
@@ -150,10 +170,12 @@ export interface NexusGenFieldTypeNames {
     feed: 'Post'
     filterPosts: 'Post'
     post: 'Post'
+    question: 'Question'
     quiz: 'Quiz'
     quizes: 'Quiz'
   }
   Question: { // field return type name
+    choices: 'Choice'
     id: 'Int'
     quiz: 'Quiz'
     title: 'String'
@@ -175,6 +197,10 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
+    createChoice: { // args
+      name: string; // String!
+      questionId?: string | null; // String
+    }
     createDraft: { // args
       authorEmail?: string | null; // String
       content?: string | null; // String
@@ -187,6 +213,9 @@ export interface NexusGenArgTypes {
     createQuestion: { // args
       quizId?: string | null; // String
       title: string; // String!
+    }
+    deleteChoice: { // args
+      choiceId?: string | null; // String
     }
     deletePost: { // args
       postId?: string | null; // String
@@ -214,6 +243,9 @@ export interface NexusGenArgTypes {
     }
     post: { // args
       postId: string; // String!
+    }
+    question: { // args
+      questionId: string; // String!
     }
     quiz: { // args
       quizId: string; // String!
