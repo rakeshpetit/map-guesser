@@ -3,6 +3,8 @@ import Router, { useRouter } from "next/router"
 import gql from "graphql-tag"
 import { useQuery, useMutation } from "@apollo/client"
 import Questions from "./questions"
+import { QuizesQuery } from ".."
+import { DraftsQuery } from "../drafts"
 
 const QuizQuery = gql`
   query quizQuery($quizId: String!) {
@@ -60,8 +62,26 @@ function Post() {
     variables: { quizId },
   })
 
-  const [publish] = useMutation(PublishQuizMutation)
-  const [deleteQuiz] = useMutation(DeleteQuizMutation)
+  const [publish] = useMutation(PublishQuizMutation, {
+    refetchQueries: [
+      {
+        query: QuizesQuery,
+      },
+      {
+        query: DraftsQuery,
+      },
+    ],
+  })
+  const [deleteQuiz] = useMutation(DeleteQuizMutation, {
+    refetchQueries: [
+      {
+        query: QuizesQuery,
+      },
+      {
+        query: DraftsQuery,
+      },
+    ],
+  })
 
   if (loading) {
     return <div>Loading ...</div>

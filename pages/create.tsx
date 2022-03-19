@@ -3,6 +3,7 @@ import Layout from "../components/Layout"
 import Router from "next/router"
 import gql from "graphql-tag"
 import { useMutation } from "@apollo/client"
+import { DraftsQuery } from "./drafts"
 
 const CreateDraftQuizMutation = gql`
   mutation CreateDraftQuizMutation($title: String!, $authorEmail: String!) {
@@ -23,7 +24,14 @@ function Draft(props) {
   const [authorEmail, setAuthorEmail] = useState("")
 
   const [createDraftQuiz, { loading, error, data }] = useMutation(
-    CreateDraftQuizMutation
+    CreateDraftQuizMutation,
+    {
+      refetchQueries: [
+        {
+          query: DraftsQuery,
+        },
+      ],
+    }
   )
 
   return (

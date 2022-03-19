@@ -3,7 +3,7 @@ import Link from "next/link"
 import gql from "graphql-tag"
 import { useQuery } from "@apollo/client"
 
-const QuizesQuery = gql`
+export const QuizesQuery = gql`
   query Quizes {
     quizes {
       id
