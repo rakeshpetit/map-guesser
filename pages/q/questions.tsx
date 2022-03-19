@@ -98,7 +98,6 @@ function Questions({ quizId, questions }) {
       {questions &&
         questions.length > 0 &&
         questions.map(question => {
-          console.log("choices", question.choices)
           return loadingDelete && question.id === deletingQuestionId ? (
             <h4 key={question.id}>Deleting...</h4>
           ) : (
