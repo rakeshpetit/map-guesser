@@ -3,6 +3,7 @@ import { DateTimeResolver } from "graphql-scalars"
 import { NextApiHandler } from "next"
 import {
   asNexusMethod,
+  booleanArg,
   makeSchema,
   nonNull,
   nullable,
@@ -84,6 +85,7 @@ const Question = objectType({
   definition(t) {
     t.int("id")
     t.string("title")
+    t.int("points")
     t.nullable.field("quiz", {
       type: "Quiz",
       resolve: parent =>
@@ -110,6 +112,7 @@ const Choice = objectType({
   definition(t) {
     t.int("id")
     t.string("name")
+    t.boolean("correct")
     t.nullable.field("question", {
       type: "Question",
       resolve: parent =>
@@ -328,16 +331,41 @@ const Mutation = objectType({
     t.field("createQuestion", {
       type: "Question",
       args: {
-        quizId: stringArg(),
+        quizId: nonNull(stringArg()),
         title: nonNull(stringArg()),
+        points: stringArg(),
       },
-      resolve: (_, { title, quizId }, ctx) => {
+      resolve: (_, { title, quizId, points }, ctx) => {
         return prisma.question.create({
           data: {
             title,
+            points: Number(points),
             quiz: {
               connect: { id: Number(quizId) },
             },
+          },
+        })
+      },
+    })
+
+    t.field("updateQuestion", {
+      type: "Question",
+      args: {
+        questionId: stringArg(),
+        title: stringArg(),
+        points: stringArg(),
+      },
+      resolve: async (_, { title, questionId, points }, ctx) => {
+        const question = await prisma.question.findUnique({
+          where: { id: Number(questionId) },
+        })
+        return prisma.question.update({
+          data: {
+            title: title || question.title,
+            points: Number(points || question.points),
+          },
+          where: {
+            id: Number(questionId),
           },
         })
       },
@@ -360,14 +388,51 @@ const Mutation = objectType({
       args: {
         questionId: stringArg(),
         name: nonNull(stringArg()),
+        correct: booleanArg(),
       },
-      resolve: (_, { questionId, name }, ctx) => {
+      resolve: (_, { questionId, name, correct }, ctx) => {
         return prisma.choice.create({
           data: {
             name,
+            correct,
             question: {
               connect: { id: Number(questionId) },
             },
+          },
+        })
+      },
+    })
+
+    t.field("updateChoice", {
+      type: "Choice",
+      args: {
+        choiceId: stringArg(),
+        name: stringArg(),
+        correct: booleanArg(),
+      },
+      resolve: async (_, { name, choiceId, correct }, ctx) => {
+        const choice = await prisma.choice.findUnique({
+          where: { id: Number(choiceId) },
+        })
+
+        if (correct) {
+          await prisma.choice.updateMany({
+            data: {
+              correct: false,
+            },
+            where: {
+              questionId: choice.questionId,
+            },
+          })
+        }
+
+        return prisma.choice.update({
+          data: {
+            name: name || choice.name,
+            correct: correct || choice.correct,
+          },
+          where: {
+            id: Number(choiceId),
           },
         })
       },
