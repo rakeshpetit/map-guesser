@@ -249,7 +249,7 @@ export interface NexusGenArgTypes {
       name?: string | null; // String
     }
     updateChoice: { // args
-      choiceId?: string | null; // String
+      choiceId: string; // String!
       correct?: boolean | null; // Boolean
       name?: string | null; // String
     }
