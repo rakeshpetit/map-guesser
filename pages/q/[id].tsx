@@ -5,12 +5,14 @@ import { useQuery, useMutation } from "@apollo/client"
 import Questions from "./questions"
 import { QuizesQuery } from ".."
 import { DraftsQuery } from "../drafts"
+import { useState } from "react"
 
 const QuizQuery = gql`
   query quizQuery($quizId: String!) {
     quiz(quizId: $quizId) {
       id
       title
+      secret
       published
       author {
         id
@@ -44,6 +46,15 @@ const PublishQuizMutation = gql`
   }
 `
 
+const UpdateQuizMutation = gql`
+  mutation UpdateQuizMutation($quizId: String!, $secret: String) {
+    updateQuiz(quizId: $quizId, secret: $secret) {
+      id
+      secret
+    }
+  }
+`
+
 const DeleteQuizMutation = gql`
   mutation DeleteQuizMutation($quizId: String!) {
     deleteQuiz(quizId: $quizId) {
@@ -59,6 +70,7 @@ const DeleteQuizMutation = gql`
 `
 
 function Post() {
+  const [secret, setSecret] = useState("")
   const quizId = useRouter().query.id
   const { loading, error, data } = useQuery(QuizQuery, {
     variables: { quizId },
@@ -85,6 +97,14 @@ function Post() {
     ],
   })
 
+  const [updateQuiz] = useMutation(UpdateQuizMutation, {
+    refetchQueries: [
+      {
+        query: DraftsQuery,
+      },
+    ],
+  })
+
   if (loading) {
     return <div>Loading ...</div>
   }
@@ -103,10 +123,44 @@ function Post() {
       <div>
         <h2>{title}</h2>
         <p>By {authorName}</p>
-        {!data.quiz.published && (
+        <span className="secret">Secret:</span>
+        <h4 className="secret">{data.quiz.secret}</h4>
+        <input
+          autoFocus
+          onChange={e => setSecret(e.target.value)}
+          onKeyDown={async e => {
+            if (e.key === "Enter") {
+              await updateQuiz({
+                variables: {
+                  quizId: `${quizId}`,
+                  secret,
+                },
+              })
+              setSecret("")
+            }
+          }}
+          placeholder="Modify secret"
+          type="text"
+          value={secret}
+        />
+        <div className="buttonLayout">
+          {!data.quiz.published && (
+            <button
+              onClick={async e => {
+                await publish({
+                  variables: {
+                    quizId,
+                  },
+                })
+                Router.push("/")
+              }}
+            >
+              Publish
+            </button>
+          )}
           <button
             onClick={async e => {
-              await publish({
+              await deleteQuiz({
                 variables: {
                   quizId,
                 },
@@ -114,26 +168,26 @@ function Post() {
               Router.push("/")
             }}
           >
-            Publish
+            Delete
           </button>
-        )}
-        <button
-          onClick={async e => {
-            await deleteQuiz({
-              variables: {
-                quizId,
-              },
-            })
-            Router.push("/")
-          }}
-        >
-          Delete
-        </button>
+        </div>
+
         {!data.quiz.published && (
           <Questions quizId={data.quiz.id} questions={data.quiz.questions} />
         )}
       </div>
       <style jsx>{`
+        .buttonLayout {
+          display: block;
+        }
+        span.secret {
+          display: inline;
+          margin-right: 0.25rem;
+        }
+        h4.secret {
+          display: inline;
+          margin-right: 0.25rem;
+        }
         .page {
           background: white;
           padding: 2rem;

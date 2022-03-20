@@ -17,7 +17,7 @@ scalar DateTime
 type Mutation {
   createChoice(correct: Boolean, name: String!, questionId: String): Choice
   createDraft(authorEmail: String, content: String, title: String!): Post
-  createDraftQuiz(authorEmail: String, title: String!): Quiz
+  createDraftQuiz(authorEmail: String, secret: String, title: String!): Quiz
   createQuestion(points: String, quizId: String!, title: String!): Question
   deleteChoice(choiceId: String): Choice
   deletePost(postId: String): Post
@@ -28,6 +28,7 @@ type Mutation {
   signupUser(email: String!, name: String): User
   updateChoice(choiceId: String!, correct: Boolean, name: String): Choice
   updateQuestion(points: String, questionId: String, title: String): Question
+  updateQuiz(quizId: String!, secret: String, title: String): Quiz
 }
 
 type Post {
@@ -62,6 +63,7 @@ type Quiz {
   id: Int
   published: Boolean
   questions: [Question]
+  secret: String
   title: String
 }
 
