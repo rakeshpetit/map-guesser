@@ -64,6 +64,7 @@ export interface NexusGenObjects {
   Quiz: { // root type
     id?: number | null; // Int
     published?: boolean | null; // Boolean
+    secret?: string | null; // String
     title?: string | null; // String
   }
   User: { // root type
@@ -104,6 +105,7 @@ export interface NexusGenFieldTypes {
     signupUser: NexusGenRootTypes['User'] | null; // User
     updateChoice: NexusGenRootTypes['Choice'] | null; // Choice
     updateQuestion: NexusGenRootTypes['Question'] | null; // Question
+    updateQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
   }
   Post: { // field return type
     author: NexusGenRootTypes['User'] | null; // User
@@ -134,6 +136,7 @@ export interface NexusGenFieldTypes {
     id: number | null; // Int
     published: boolean | null; // Boolean
     questions: Array<NexusGenRootTypes['Question'] | null> | null; // [Question]
+    secret: string | null; // String
     title: string | null; // String
   }
   User: { // field return type
@@ -165,6 +168,7 @@ export interface NexusGenFieldTypeNames {
     signupUser: 'User'
     updateChoice: 'Choice'
     updateQuestion: 'Question'
+    updateQuiz: 'Quiz'
   }
   Post: { // field return type name
     author: 'User'
@@ -195,6 +199,7 @@ export interface NexusGenFieldTypeNames {
     id: 'Int'
     published: 'Boolean'
     questions: 'Question'
+    secret: 'String'
     title: 'String'
   }
   User: { // field return type name
@@ -219,6 +224,7 @@ export interface NexusGenArgTypes {
     }
     createDraftQuiz: { // args
       authorEmail?: string | null; // String
+      secret?: string | null; // String
       title: string; // String!
     }
     createQuestion: { // args
@@ -256,6 +262,11 @@ export interface NexusGenArgTypes {
     updateQuestion: { // args
       points?: string | null; // String
       questionId?: string | null; // String
+      title?: string | null; // String
+    }
+    updateQuiz: { // args
+      quizId: string; // String!
+      secret?: string | null; // String
       title?: string | null; // String
     }
   }

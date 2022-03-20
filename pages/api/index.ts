@@ -58,6 +58,7 @@ const Quiz = objectType({
   definition(t) {
     t.int("id")
     t.string("title")
+    t.string("secret")
     t.boolean("published")
     t.nullable.field("author", {
       type: "User",
@@ -288,16 +289,41 @@ const Mutation = objectType({
       type: "Quiz",
       args: {
         title: nonNull(stringArg()),
+        secret: stringArg(),
         authorEmail: stringArg(),
       },
-      resolve: (_, { title, authorEmail }, ctx) => {
+      resolve: (_, { title, secret, authorEmail }, ctx) => {
         return prisma.quiz.create({
           data: {
             title,
+            secret,
             published: false,
             author: {
               connect: { email: authorEmail },
             },
+          },
+        })
+      },
+    })
+
+    t.field("updateQuiz", {
+      type: "Quiz",
+      args: {
+        quizId: nonNull(stringArg()),
+        title: stringArg(),
+        secret: stringArg(),
+      },
+      resolve: async (_, { title, quizId, secret }, ctx) => {
+        const quiz = await prisma.quiz.findUnique({
+          where: { id: Number(quizId) },
+        })
+        return prisma.quiz.update({
+          data: {
+            title: title || quiz.title,
+            secret: secret || quiz.secret,
+          },
+          where: {
+            id: Number(quizId),
           },
         })
       },
