@@ -335,7 +335,7 @@ const Mutation = objectType({
         title: nonNull(stringArg()),
         points: stringArg(),
       },
-      resolve: (_, { title, quizId, points }, ctx) => {
+      resolve: (_, { title, quizId, points = 1 }, ctx) => {
         return prisma.question.create({
           data: {
             title,

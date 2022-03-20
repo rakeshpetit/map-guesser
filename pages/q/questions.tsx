@@ -1,7 +1,7 @@
 import gql from "graphql-tag"
 import { useMutation } from "@apollo/client"
-import { useState } from "react"
-import Choices from "./choices"
+import { useEffect, useState } from "react"
+import Choices, { QuestionQuery } from "./choices"
 
 const QuizQuery = gql`
   query quizQuery($quizId: String!) {
@@ -16,6 +16,7 @@ const QuizQuery = gql`
       questions {
         id
         title
+        points
         choices {
           id
           name
@@ -34,6 +35,14 @@ const CreateQuestionMutation = gql`
   }
 `
 
+const UpdateQuestionMutation = gql`
+  mutation UpdateQuestion($questionId: String!, $points: String!) {
+    updateQuestion(questionId: $questionId, points: $points) {
+      id
+    }
+  }
+`
+
 const DeleteQuestionMutation = gql`
   mutation DeleteQuestionMutation($questionId: String!) {
     deleteQuestion(questionId: $questionId) {
@@ -45,6 +54,8 @@ const DeleteQuestionMutation = gql`
 
 function Questions({ quizId, questions }) {
   const [title, setTitle] = useState("")
+  const [points, setPoints] = useState({})
+  const [refreshQuestionId, setRefreshQuestionId] = useState(-1)
   const [deletingQuestionId, setDeletingQuestionId] = useState(null)
 
   const [createQuestion, { loading }] = useMutation(CreateQuestionMutation, {
@@ -55,6 +66,18 @@ function Questions({ quizId, questions }) {
       },
     ],
   })
+
+  const [updateQuestion, { loading: loadingUpdate }] = useMutation(
+    UpdateQuestionMutation,
+    {
+      refetchQueries: [
+        {
+          query: QuestionQuery,
+          variables: { questionId: `${refreshQuestionId}` },
+        },
+      ],
+    }
+  )
 
   const [deleteQuestion, { loading: loadingDelete }] = useMutation(
     DeleteQuestionMutation,
@@ -101,8 +124,8 @@ function Questions({ quizId, questions }) {
           return loadingDelete && question.id === deletingQuestionId ? (
             <h4 key={question.id}>Deleting...</h4>
           ) : (
-            <div className="question">
-              <h4 key={question.id}>{question.title}</h4>
+            <div key={question.id} className="question">
+              <h4>{question.title}</h4>
               <button
                 onClick={async e => {
                   setDeletingQuestionId(question.id)
@@ -115,6 +138,35 @@ function Questions({ quizId, questions }) {
               >
                 Delete
               </button>
+              <h4 key={question.id}>{question.points} points</h4>
+              <input
+                className="points"
+                autoFocus
+                onChange={e => {
+                  setRefreshQuestionId(question.id)
+                  return setPoints({
+                    ...points,
+                    [question.id]: e.target.value,
+                  })
+                }}
+                onKeyDown={async e => {
+                  if (e.key === "Enter") {
+                    await updateQuestion({
+                      variables: {
+                        questionId: `${question.id}`,
+                        points: points[question.id],
+                      },
+                    })
+                  }
+                }}
+                placeholder={
+                  points[question.id] === undefined
+                    ? question.points
+                    : points[question.id]
+                }
+                type="text"
+                value={points[question.id]}
+              />
               <Choices questionId={question.id} choices={question.choices} />
             </div>
           )
@@ -126,6 +178,10 @@ function Questions({ quizId, questions }) {
           margin-bottom: 2rem;
           padding-top: 1rem;
           background-color: #b1c6e4;
+        }
+        input.points {
+          margin-left: 1rem;
+          width: 4rem;
         }
         h2 {
           display: block;

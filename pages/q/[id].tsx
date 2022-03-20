@@ -19,6 +19,7 @@ const QuizQuery = gql`
       questions {
         id
         title
+        points
         choices {
           id
           name

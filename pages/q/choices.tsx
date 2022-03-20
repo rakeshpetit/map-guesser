@@ -2,11 +2,12 @@ import gql from "graphql-tag"
 import { useMutation } from "@apollo/client"
 import { useState } from "react"
 
-const QuestionQuery = gql`
+export const QuestionQuery = gql`
   query Question($questionId: String!) {
     question(questionId: $questionId) {
       id
       title
+      points
       choices {
         id
         name
@@ -66,8 +67,8 @@ function Choices({ questionId, choices }) {
           return loadingDelete && choice.id === deletingChoiceId ? (
             <h4 key={choice.id}>Deleting...</h4>
           ) : (
-            <div className="deleteChoice">
-              <h4 key={choice.id}>{choice.name}</h4>
+            <div key={choice.id} className="deleteChoice">
+              <h4>{choice.name}</h4>
               <button
                 onClick={async e => {
                   setDeletingChoiceId(choice.id)
