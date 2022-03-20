@@ -26,7 +26,7 @@ type Mutation {
   publish(postId: String): Post
   publishQuiz(quizId: String): Quiz
   signupUser(email: String!, name: String): User
-  updateChoice(choiceId: String, correct: Boolean, name: String): Choice
+  updateChoice(choiceId: String!, correct: Boolean, name: String): Choice
   updateQuestion(points: String, questionId: String, title: String): Question
 }
 

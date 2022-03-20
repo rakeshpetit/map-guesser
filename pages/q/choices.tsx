@@ -11,6 +11,7 @@ export const QuestionQuery = gql`
       choices {
         id
         name
+        correct
       }
     }
   }
@@ -21,6 +22,13 @@ const CreateChoiceMutation = gql`
     createChoice(name: $name, questionId: $questionId) {
       id
       name
+    }
+  }
+`
+const UpdateChoiceMutation = gql`
+  mutation UpdateChoice($name: String, $correct: Boolean, $choiceId: String!) {
+    updateChoice(name: $name, correct: $correct, choiceId: $choiceId) {
+      id
     }
   }
 `
@@ -38,7 +46,7 @@ function Choices({ questionId, choices }) {
   const [name, setName] = useState("")
   const [deletingChoiceId, setDeletingChoiceId] = useState(null)
 
-  const [createQuestion, { loading }] = useMutation(CreateChoiceMutation, {
+  const [createChoice, { loading }] = useMutation(CreateChoiceMutation, {
     refetchQueries: [
       {
         query: QuestionQuery,
@@ -47,7 +55,19 @@ function Choices({ questionId, choices }) {
     ],
   })
 
-  const [deleteQuestion, { loading: loadingDelete }] = useMutation(
+  const [updateChoice, { loading: loadingUpdate }] = useMutation(
+    UpdateChoiceMutation,
+    {
+      refetchQueries: [
+        {
+          query: QuestionQuery,
+          variables: { questionId: `${questionId}` },
+        },
+      ],
+    }
+  )
+
+  const [deleteChoice, { loading: loadingDelete }] = useMutation(
     DeleteChoiceMutation,
     {
       refetchQueries: [
@@ -68,11 +88,26 @@ function Choices({ questionId, choices }) {
             <h4 key={choice.id}>Deleting...</h4>
           ) : (
             <div key={choice.id} className="deleteChoice">
+              <input
+                type="radio"
+                name={questionId}
+                value={choice.id}
+                onChange={async e => {
+                  await updateChoice({
+                    variables: {
+                      choiceId: `${e.target.value}`,
+                      correct: true,
+                    },
+                  })
+                }}
+                checked={choice.correct}
+              ></input>
+              <label htmlFor={choice.id} />
               <h4>{choice.name}</h4>
               <button
                 onClick={async e => {
                   setDeletingChoiceId(choice.id)
-                  await deleteQuestion({
+                  await deleteChoice({
                     variables: {
                       choiceId: `${choice.id}`,
                     },
@@ -93,7 +128,7 @@ function Choices({ questionId, choices }) {
             onChange={e => setName(e.target.value)}
             onKeyDown={async e => {
               if (e.key === "Enter") {
-                await createQuestion({
+                await createChoice({
                   variables: {
                     name,
                     questionId: `${questionId}`,

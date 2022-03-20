@@ -406,7 +406,7 @@ const Mutation = objectType({
     t.field("updateChoice", {
       type: "Choice",
       args: {
-        choiceId: stringArg(),
+        choiceId: nonNull(stringArg()),
         name: stringArg(),
         correct: booleanArg(),
       },

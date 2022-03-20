@@ -23,6 +23,7 @@ const QuizQuery = gql`
         choices {
           id
           name
+          correct
         }
       }
     }
