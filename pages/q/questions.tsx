@@ -166,7 +166,7 @@ function Questions({ quizId, questions }) {
                     : points[question.id]
                 }
                 type="text"
-                value={points[question.id]}
+                value={points[question.id] || ""}
               />
               <Choices questionId={question.id} choices={question.choices} />
             </div>

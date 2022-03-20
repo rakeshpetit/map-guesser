@@ -93,7 +93,6 @@ function Choices({ questionId, choices }) {
                 name={questionId}
                 value={choice.id}
                 onChange={async e => {
-                  console.log("e", e.target.value)
                   await updateChoice({
                     variables: {
                       choiceId: `${e.target.value}`,
