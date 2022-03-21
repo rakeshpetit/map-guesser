@@ -67,6 +67,9 @@ export interface NexusGenObjects {
     secret?: string | null; // String
     title?: string | null; // String
   }
+  Response: { // root type
+    id?: number | null; // Int
+  }
   User: { // root type
     email?: string | null; // String
     id?: number | null; // Int
@@ -96,6 +99,7 @@ export interface NexusGenFieldTypes {
     createDraft: NexusGenRootTypes['Post'] | null; // Post
     createDraftQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     createQuestion: NexusGenRootTypes['Question'] | null; // Question
+    createResponse: NexusGenRootTypes['Response'] | null; // Response
     deleteChoice: NexusGenRootTypes['Choice'] | null; // Choice
     deletePost: NexusGenRootTypes['Post'] | null; // Post
     deleteQuestion: NexusGenRootTypes['Question'] | null; // Question
@@ -136,8 +140,14 @@ export interface NexusGenFieldTypes {
     id: number | null; // Int
     published: boolean | null; // Boolean
     questions: Array<NexusGenRootTypes['Question'] | null> | null; // [Question]
+    responses: Array<NexusGenRootTypes['Response'] | null> | null; // [Response]
     secret: string | null; // String
     title: string | null; // String
+  }
+  Response: { // field return type
+    author: NexusGenRootTypes['User'] | null; // User
+    id: number | null; // Int
+    quiz: NexusGenRootTypes['Quiz'] | null; // Quiz
   }
   User: { // field return type
     email: string | null; // String
@@ -159,6 +169,7 @@ export interface NexusGenFieldTypeNames {
     createDraft: 'Post'
     createDraftQuiz: 'Quiz'
     createQuestion: 'Question'
+    createResponse: 'Response'
     deleteChoice: 'Choice'
     deletePost: 'Post'
     deleteQuestion: 'Question'
@@ -199,8 +210,14 @@ export interface NexusGenFieldTypeNames {
     id: 'Int'
     published: 'Boolean'
     questions: 'Question'
+    responses: 'Response'
     secret: 'String'
     title: 'String'
+  }
+  Response: { // field return type name
+    author: 'User'
+    id: 'Int'
+    quiz: 'Quiz'
   }
   User: { // field return type name
     email: 'String'
@@ -231,6 +248,11 @@ export interface NexusGenArgTypes {
       points?: string | null; // String
       quizId: string; // String!
       title: string; // String!
+    }
+    createResponse: { // args
+      quizId: string; // String!
+      secret: string; // String!
+      userEmail: string; // String!
     }
     deleteChoice: { // args
       choiceId?: string | null; // String

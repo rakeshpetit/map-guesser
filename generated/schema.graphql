@@ -19,6 +19,7 @@ type Mutation {
   createDraft(authorEmail: String, content: String, title: String!): Post
   createDraftQuiz(authorEmail: String, secret: String, title: String!): Quiz
   createQuestion(points: String, quizId: String!, title: String!): Question
+  createResponse(quizId: String!, secret: String!, userEmail: String!): Response
   deleteChoice(choiceId: String): Choice
   deletePost(postId: String): Post
   deleteQuestion(questionId: String): Question
@@ -63,8 +64,15 @@ type Quiz {
   id: Int
   published: Boolean
   questions: [Question]
+  responses: [Response]
   secret: String
   title: String
+}
+
+type Response {
+  author: User
+  id: Int
+  quiz: Quiz
 }
 
 type User {

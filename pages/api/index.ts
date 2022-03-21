@@ -78,6 +78,15 @@ const Quiz = objectType({
           })
           .questions(),
     })
+    t.list.field("responses", {
+      type: "Response",
+      resolve: parent =>
+        prisma.quiz
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .responses(),
+    })
   },
 })
 
@@ -122,6 +131,31 @@ const Choice = objectType({
             where: { id: Number(parent.id) },
           })
           .question(),
+    })
+  },
+})
+
+const Response = objectType({
+  name: "Response",
+  definition(t) {
+    t.int("id")
+    t.nullable.field("author", {
+      type: "User",
+      resolve: parent =>
+        prisma.quiz
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .author(),
+    })
+    t.nullable.field("quiz", {
+      type: "Quiz",
+      resolve: parent =>
+        prisma.question
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .quiz(),
     })
   },
 })
@@ -475,11 +509,58 @@ const Mutation = objectType({
         })
       },
     })
+
+    t.field("createResponse", {
+      type: "Response",
+      args: {
+        quizId: nonNull(stringArg()),
+        secret: nonNull(stringArg()),
+        userEmail: nonNull(stringArg()),
+      },
+      resolve: async (_, { quizId, secret, userEmail }, ctx) => {
+        const quiz = await prisma.quiz.findUnique({
+          where: { id: Number(quizId) },
+        })
+        const user = await prisma.user.findUnique({
+          where: { email: userEmail },
+        })
+        if (secret === quiz.secret && user) {
+          const response = await prisma.response.findFirst({
+            where: { quizId: Number(quizId), authorId: user.id },
+          })
+          if (response) {
+            return response
+          }
+          return prisma.response.create({
+            data: {
+              quiz: {
+                connect: { id: Number(quizId) },
+              },
+              author: {
+                connect: { email: userEmail },
+              },
+            },
+          })
+        } else {
+          throw new Error("Either the user email or secret is invalid.")
+        }
+      },
+    })
   },
 })
 
 export const schema = makeSchema({
-  types: [Query, Mutation, Post, User, Quiz, Question, Choice, GQLDate],
+  types: [
+    Query,
+    Mutation,
+    Post,
+    User,
+    Quiz,
+    Question,
+    Choice,
+    Response,
+    GQLDate,
+  ],
   outputs: {
     typegen: path.join(process.cwd(), "generated/nexus-typegen.ts"),
     schema: path.join(process.cwd(), "generated/schema.graphql"),
