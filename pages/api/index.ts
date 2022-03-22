@@ -142,7 +142,7 @@ const Response = objectType({
     t.nullable.field("author", {
       type: "User",
       resolve: parent =>
-        prisma.quiz
+        prisma.response
           .findUnique({
             where: { id: Number(parent.id) },
           })
@@ -151,7 +151,7 @@ const Response = objectType({
     t.nullable.field("quiz", {
       type: "Quiz",
       resolve: parent =>
-        prisma.question
+        prisma.response
           .findUnique({
             where: { id: Number(parent.id) },
           })
@@ -248,6 +248,18 @@ const Query = objectType({
       resolve: (_, args) => {
         return prisma.question.findUnique({
           where: { id: Number(args.questionId) },
+        })
+      },
+    })
+
+    t.field("response", {
+      type: "Response",
+      args: {
+        responseId: nonNull(stringArg()),
+      },
+      resolve: (_, args) => {
+        return prisma.response.findUnique({
+          where: { id: Number(args.responseId) },
         })
       },
     })

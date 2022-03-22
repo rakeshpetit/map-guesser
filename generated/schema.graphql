@@ -49,6 +49,7 @@ type Query {
   question(questionId: String!): Question
   quiz(quizId: String!): Quiz
   quizes: [Quiz]
+  response(responseId: String!): Response
 }
 
 type Question {

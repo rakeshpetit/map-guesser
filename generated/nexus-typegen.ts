@@ -127,6 +127,7 @@ export interface NexusGenFieldTypes {
     question: NexusGenRootTypes['Question'] | null; // Question
     quiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     quizes: Array<NexusGenRootTypes['Quiz'] | null> | null; // [Quiz]
+    response: NexusGenRootTypes['Response'] | null; // Response
   }
   Question: { // field return type
     choices: Array<NexusGenRootTypes['Choice'] | null> | null; // [Choice]
@@ -197,6 +198,7 @@ export interface NexusGenFieldTypeNames {
     question: 'Question'
     quiz: 'Quiz'
     quizes: 'Quiz'
+    response: 'Response'
   }
   Question: { // field return type name
     choices: 'Choice'
@@ -304,6 +306,9 @@ export interface NexusGenArgTypes {
     }
     quiz: { // args
       quizId: string; // String!
+    }
+    response: { // args
+      responseId: string; // String!
     }
   }
 }
