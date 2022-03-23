@@ -44,7 +44,11 @@ function Response() {
   return (
     <Layout>
       <h2>{quiz.title}</h2>
-      {<Questions quizId={quiz.id} questions={quiz.questions} />}
+      <Questions
+        responseId={responseId}
+        quizId={quiz.id}
+        questions={quiz.questions}
+      />
       <style jsx>{`
         .buttonLayout {
           display: block;

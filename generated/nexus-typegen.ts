@@ -129,6 +129,7 @@ export interface NexusGenFieldTypes {
     title: string | null; // String
   }
   Query: { // field return type
+    answers: Array<NexusGenRootTypes['Answer'] | null> | null; // [Answer]
     draftQuizes: Array<NexusGenRootTypes['Quiz'] | null> | null; // [Quiz]
     drafts: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
     feed: Array<NexusGenRootTypes['Post'] | null> | null; // [Post]
@@ -207,6 +208,7 @@ export interface NexusGenFieldTypeNames {
     title: 'String'
   }
   Query: { // field return type name
+    answers: 'Answer'
     draftQuizes: 'Quiz'
     drafts: 'Post'
     feed: 'Post'
@@ -317,6 +319,9 @@ export interface NexusGenArgTypes {
     }
   }
   Query: {
+    answers: { // args
+      responseId: string; // String!
+    }
     filterPosts: { // args
       searchString?: string | null; // String
     }

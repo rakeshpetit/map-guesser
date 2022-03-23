@@ -295,6 +295,18 @@ const Query = objectType({
         })
       },
     })
+
+    t.list.field("answers", {
+      type: "Answer",
+      args: {
+        responseId: nonNull(stringArg()),
+      },
+      resolve: (_, args) => {
+        return prisma.answer.findMany({
+          where: { responseId: Number(args.responseId) },
+        })
+      },
+    })
   },
 })
 

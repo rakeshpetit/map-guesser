@@ -49,6 +49,7 @@ type Post {
 }
 
 type Query {
+  answers(responseId: String!): [Answer]
   draftQuizes: [Quiz]
   drafts: [Post]
   feed: [Post]

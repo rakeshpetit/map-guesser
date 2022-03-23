@@ -1,6 +1,6 @@
 import gql from "graphql-tag"
 import { useMutation } from "@apollo/client"
-import { useState } from "react"
+import { AnswersQuery } from "./questions"
 
 export const QuestionQuery = gql`
   query Question($questionId: String!) {
@@ -17,21 +17,28 @@ export const QuestionQuery = gql`
   }
 `
 
-const CreateChoiceMutation = gql`
-  mutation CreateChoice($name: String!, $questionId: String!) {
-    createChoice(name: $name, questionId: $questionId) {
+const CreateAnswerMutation = gql`
+  mutation CreateAnswer(
+    $responseId: String!
+    $questionId: String!
+    $choiceId: String!
+  ) {
+    createAnswer(
+      responseId: $responseId
+      questionId: $questionId
+      choiceId: $choiceId
+    ) {
       id
-      name
     }
   }
 `
 
-function Choices({ questionId, choices }) {
-  const [createAnswer, { loading }] = useMutation(CreateChoiceMutation, {
+function Choices({ questionId, responseId, choices, selectedAnswer }) {
+  const [createAnswer, { loading }] = useMutation(CreateAnswerMutation, {
     refetchQueries: [
       {
-        query: QuestionQuery,
-        variables: { questionId: `${questionId}` },
+        query: AnswersQuery,
+        variables: { responseId: `${responseId}` },
       },
     ],
   })
@@ -50,12 +57,13 @@ function Choices({ questionId, choices }) {
                 onChange={async e => {
                   await createAnswer({
                     variables: {
+                      responseId: responseId,
+                      questionId: `${questionId}`,
                       choiceId: `${e.target.value}`,
-                      correct: true,
                     },
                   })
                 }}
-                checked={choice.correct}
+                checked={selectedAnswer?.choice?.id === choice.id}
               ></input>
               <label htmlFor={choice.id} />
               <h4>{choice.name}</h4>
