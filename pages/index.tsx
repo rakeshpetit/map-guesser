@@ -19,7 +19,7 @@ export const QuizesQuery = gql`
 
 const Quiz = ({ quiz }) => {
   return (
-    <Link href="/q/[id]" as={`/q/${quiz.id}`}>
+    <Link href="/r/[id]" as={`/r/${quiz.id}`}>
       <a>
         <h2>{quiz.title}</h2>
         <small>By {quiz.author ? quiz.author.name : "Unknown Author"}</small>

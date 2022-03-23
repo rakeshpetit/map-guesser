@@ -2,6 +2,13 @@
 ### Do not make changes to this file directly
 
 
+type Answer {
+  choice: Choice
+  id: Int
+  question: Question
+  response: Response
+}
+
 type Choice {
   correct: Boolean
   id: Int
@@ -15,10 +22,12 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Mutation {
+  createAnswer(choiceId: String!, questionId: String!, responseId: String!): Answer
   createChoice(correct: Boolean, name: String!, questionId: String): Choice
   createDraft(authorEmail: String, content: String, title: String!): Post
   createDraftQuiz(authorEmail: String, secret: String, title: String!): Quiz
   createQuestion(points: String, quizId: String!, title: String!): Question
+  createResponse(quizId: String!, secret: String!, userEmail: String!): Response
   deleteChoice(choiceId: String): Choice
   deletePost(postId: String): Post
   deleteQuestion(questionId: String): Question
@@ -40,6 +49,7 @@ type Post {
 }
 
 type Query {
+  answers(responseId: String!): [Answer]
   draftQuizes: [Quiz]
   drafts: [Post]
   feed: [Post]
@@ -48,6 +58,7 @@ type Query {
   question(questionId: String!): Question
   quiz(quizId: String!): Quiz
   quizes: [Quiz]
+  response(responseId: String!): Response
 }
 
 type Question {
@@ -63,8 +74,15 @@ type Quiz {
   id: Int
   published: Boolean
   questions: [Question]
+  responses: [Response]
   secret: String
   title: String
+}
+
+type Response {
+  author: User
+  id: Int
+  quiz: Quiz
 }
 
 type User {

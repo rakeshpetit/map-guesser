@@ -47,7 +47,7 @@ function Signup(props) {
           />
           <input
             onChange={e => setEmail(e.target.value)}
-            placeholder="Email address)"
+            placeholder="Email address"
             type="text"
             value={email}
           />

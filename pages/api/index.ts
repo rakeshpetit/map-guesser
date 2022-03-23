@@ -72,11 +72,19 @@ const Quiz = objectType({
     t.list.field("questions", {
       type: "Question",
       resolve: parent =>
+        prisma.question.findMany({
+          orderBy: [{ id: "asc" }],
+          where: { quizId: Number(parent.id) },
+        }),
+    })
+    t.list.field("responses", {
+      type: "Response",
+      resolve: parent =>
         prisma.quiz
           .findUnique({
             where: { id: Number(parent.id) },
           })
-          .questions(),
+          .responses(),
     })
   },
 })
@@ -99,11 +107,10 @@ const Question = objectType({
     t.list.field("choices", {
       type: "Choice",
       resolve: parent =>
-        prisma.question
-          .findUnique({
-            where: { id: Number(parent.id) },
-          })
-          .choices(),
+        prisma.choice.findMany({
+          orderBy: [{ id: "asc" }],
+          where: { questionId: Number(parent.id) },
+        }),
     })
   },
 })
@@ -122,6 +129,65 @@ const Choice = objectType({
             where: { id: Number(parent.id) },
           })
           .question(),
+    })
+  },
+})
+
+const Response = objectType({
+  name: "Response",
+  definition(t) {
+    t.int("id")
+    t.nullable.field("author", {
+      type: "User",
+      resolve: parent =>
+        prisma.response
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .author(),
+    })
+    t.nullable.field("quiz", {
+      type: "Quiz",
+      resolve: parent =>
+        prisma.response
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .quiz(),
+    })
+  },
+})
+
+const Answer = objectType({
+  name: "Answer",
+  definition(t) {
+    t.int("id")
+    t.nullable.field("question", {
+      type: "Question",
+      resolve: parent =>
+        prisma.answer
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .question(),
+    })
+    t.nullable.field("response", {
+      type: "Response",
+      resolve: parent =>
+        prisma.answer
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .response(),
+    })
+    t.nullable.field("choice", {
+      type: "Choice",
+      resolve: parent =>
+        prisma.answer
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .choice(),
     })
   },
 })
@@ -214,6 +280,30 @@ const Query = objectType({
       resolve: (_, args) => {
         return prisma.question.findUnique({
           where: { id: Number(args.questionId) },
+        })
+      },
+    })
+
+    t.field("response", {
+      type: "Response",
+      args: {
+        responseId: nonNull(stringArg()),
+      },
+      resolve: (_, args) => {
+        return prisma.response.findUnique({
+          where: { id: Number(args.responseId) },
+        })
+      },
+    })
+
+    t.list.field("answers", {
+      type: "Answer",
+      args: {
+        responseId: nonNull(stringArg()),
+      },
+      resolve: (_, args) => {
+        return prisma.answer.findMany({
+          where: { responseId: Number(args.responseId) },
         })
       },
     })
@@ -475,11 +565,97 @@ const Mutation = objectType({
         })
       },
     })
+
+    t.field("createResponse", {
+      type: "Response",
+      args: {
+        quizId: nonNull(stringArg()),
+        secret: nonNull(stringArg()),
+        userEmail: nonNull(stringArg()),
+      },
+      resolve: async (_, { quizId, secret, userEmail }, ctx) => {
+        const quiz = await prisma.quiz.findUnique({
+          where: { id: Number(quizId) },
+        })
+        const user = await prisma.user.findUnique({
+          where: { email: userEmail },
+        })
+        if (secret === quiz.secret && user) {
+          const response = await prisma.response.findFirst({
+            where: { quizId: Number(quizId), authorId: user.id },
+          })
+          if (response) {
+            return response
+          }
+          return prisma.response.create({
+            data: {
+              quiz: {
+                connect: { id: Number(quizId) },
+              },
+              author: {
+                connect: { email: userEmail },
+              },
+            },
+          })
+        } else {
+          throw new Error("Either the user email or secret is invalid.")
+        }
+      },
+    })
+
+    t.field("createAnswer", {
+      type: "Answer",
+      args: {
+        questionId: nonNull(stringArg()),
+        responseId: nonNull(stringArg()),
+        choiceId: nonNull(stringArg()),
+      },
+      resolve: async (_, { questionId, responseId, choiceId }, ctx) => {
+        const answer = await prisma.answer.findFirst({
+          where: {
+            questionId: Number(questionId),
+            responseId: Number(responseId),
+          },
+        })
+
+        if (answer) {
+          return prisma.answer.update({
+            where: {
+              id: answer.id,
+            },
+            data: {
+              questionId: Number(questionId),
+              responseId: Number(responseId),
+              choiceId: Number(choiceId),
+            },
+          })
+        } else {
+          return prisma.answer.create({
+            data: {
+              questionId: Number(questionId),
+              responseId: Number(responseId),
+              choiceId: Number(choiceId),
+            },
+          })
+        }
+      },
+    })
   },
 })
 
 export const schema = makeSchema({
-  types: [Query, Mutation, Post, User, Quiz, Question, Choice, GQLDate],
+  types: [
+    Query,
+    Mutation,
+    Post,
+    User,
+    Quiz,
+    Question,
+    Choice,
+    Response,
+    Answer,
+    GQLDate,
+  ],
   outputs: {
     typegen: path.join(process.cwd(), "generated/nexus-typegen.ts"),
     schema: path.join(process.cwd(), "generated/schema.graphql"),

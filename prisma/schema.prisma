@@ -8,11 +8,12 @@ datasource db {
 }
 
 model User {
-  email  String  @unique
-  id     Int     @id @default(autoincrement())
-  name   String?
-  posts  Post[]
-  quizes Quiz[]
+  email     String     @unique
+  id        Int        @id @default(autoincrement())
+  name      String?
+  posts     Post[]
+  quizes    Quiz[]
+  responses Response[]
 }
 
 model Post {
@@ -32,6 +33,7 @@ model Quiz {
   authorId  Int?
   author    User?      @relation(fields: [authorId], references: [id])
   questions Question[]
+  responses Response[]
 }
 
 model Question {
@@ -41,6 +43,7 @@ model Question {
   quizId  Int?
   quiz    Quiz?    @relation(fields: [quizId], references: [id])
   choices Choice[]
+  Answer  Answer[]
 }
 
 model Choice {
@@ -49,4 +52,24 @@ model Choice {
   name       String
   questionId Int?
   question   Question? @relation(fields: [questionId], references: [id])
+  Answer     Answer[]
+}
+
+model Response {
+  id       Int      @id @default(autoincrement())
+  authorId Int?
+  author   User?    @relation(fields: [authorId], references: [id])
+  quizId   Int?
+  quiz     Quiz?    @relation(fields: [quizId], references: [id])
+  Answer   Answer[]
+}
+
+model Answer {
+  id         Int       @id @default(autoincrement())
+  questionId Int?
+  question   Question? @relation(fields: [questionId], references: [id])
+  choiceId   Int?
+  choice     Choice?   @relation(fields: [choiceId], references: [id])
+  responseId Int?
+  response   Response? @relation(fields: [responseId], references: [id])
 }
