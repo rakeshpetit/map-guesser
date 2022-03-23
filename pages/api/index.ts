@@ -72,11 +72,10 @@ const Quiz = objectType({
     t.list.field("questions", {
       type: "Question",
       resolve: parent =>
-        prisma.quiz
-          .findUnique({
-            where: { id: Number(parent.id) },
-          })
-          .questions(),
+        prisma.question.findMany({
+          orderBy: [{ id: "asc" }],
+          where: { quizId: Number(parent.id) },
+        }),
     })
     t.list.field("responses", {
       type: "Response",
@@ -108,11 +107,10 @@ const Question = objectType({
     t.list.field("choices", {
       type: "Choice",
       resolve: parent =>
-        prisma.question
-          .findUnique({
-            where: { id: Number(parent.id) },
-          })
-          .choices(),
+        prisma.choice.findMany({
+          orderBy: [{ id: "asc" }],
+          where: { questionId: Number(parent.id) },
+        }),
     })
   },
 })
