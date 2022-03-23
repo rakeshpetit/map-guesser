@@ -3,6 +3,7 @@ import Router, { useRouter } from "next/router"
 import gql from "graphql-tag"
 import { useMutation, useQuery } from "@apollo/client"
 import { useState } from "react"
+import Questions from "./questions"
 
 const ResponseQuery = gql`
   query responseQuery($responseId: String!) {
@@ -12,6 +13,7 @@ const ResponseQuery = gql`
         id
         title
         questions {
+          points
           title
           id
           choices {
@@ -30,10 +32,19 @@ function Response() {
     variables: { responseId },
   })
 
-  console.log("data", data)
+  if (loading) {
+    return <div>Loading ...</div>
+  }
+  if (error) {
+    return <div>Error: {error.message}</div>
+  }
+
+  const { quiz } = data.response
+
   return (
     <Layout>
-      <div>Response</div>
+      <h2>{quiz.title}</h2>
+      {<Questions quizId={quiz.id} questions={quiz.questions} />}
       <style jsx>{`
         .buttonLayout {
           display: block;
