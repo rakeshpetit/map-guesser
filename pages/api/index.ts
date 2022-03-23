@@ -158,6 +158,40 @@ const Response = objectType({
   },
 })
 
+const Answer = objectType({
+  name: "Answer",
+  definition(t) {
+    t.int("id")
+    t.nullable.field("question", {
+      type: "Question",
+      resolve: parent =>
+        prisma.answer
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .question(),
+    })
+    t.nullable.field("response", {
+      type: "Response",
+      resolve: parent =>
+        prisma.answer
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .response(),
+    })
+    t.nullable.field("choice", {
+      type: "Choice",
+      resolve: parent =>
+        prisma.answer
+          .findUnique({
+            where: { id: Number(parent.id) },
+          })
+          .choice(),
+    })
+  },
+})
+
 const Query = objectType({
   name: "Query",
   definition(t) {
@@ -556,6 +590,44 @@ const Mutation = objectType({
         }
       },
     })
+
+    t.field("createAnswer", {
+      type: "Answer",
+      args: {
+        questionId: nonNull(stringArg()),
+        responseId: nonNull(stringArg()),
+        choiceId: nonNull(stringArg()),
+      },
+      resolve: async (_, { questionId, responseId, choiceId }, ctx) => {
+        const answer = await prisma.answer.findFirst({
+          where: {
+            questionId: Number(questionId),
+            responseId: Number(responseId),
+          },
+        })
+
+        if (answer) {
+          return prisma.answer.update({
+            where: {
+              id: answer.id,
+            },
+            data: {
+              questionId: Number(questionId),
+              responseId: Number(responseId),
+              choiceId: Number(choiceId),
+            },
+          })
+        } else {
+          return prisma.answer.create({
+            data: {
+              questionId: Number(questionId),
+              responseId: Number(responseId),
+              choiceId: Number(choiceId),
+            },
+          })
+        }
+      },
+    })
   },
 })
 
@@ -569,6 +641,7 @@ export const schema = makeSchema({
     Question,
     Choice,
     Response,
+    Answer,
     GQLDate,
   ],
   outputs: {

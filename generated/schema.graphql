@@ -2,6 +2,13 @@
 ### Do not make changes to this file directly
 
 
+type Answer {
+  choice: Choice
+  id: Int
+  question: Question
+  response: Response
+}
+
 type Choice {
   correct: Boolean
   id: Int
@@ -15,6 +22,7 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 scalar DateTime
 
 type Mutation {
+  createAnswer(choiceId: String!, questionId: String!, responseId: String!): Answer
   createChoice(correct: Boolean, name: String!, questionId: String): Choice
   createDraft(authorEmail: String, content: String, title: String!): Post
   createDraftQuiz(authorEmail: String, secret: String, title: String!): Quiz

@@ -43,6 +43,9 @@ export interface NexusGenScalars {
 }
 
 export interface NexusGenObjects {
+  Answer: { // root type
+    id?: number | null; // Int
+  }
   Choice: { // root type
     correct?: boolean | null; // Boolean
     id?: number | null; // Int
@@ -88,6 +91,12 @@ export type NexusGenRootTypes = NexusGenObjects
 export type NexusGenAllTypes = NexusGenRootTypes & NexusGenScalars
 
 export interface NexusGenFieldTypes {
+  Answer: { // field return type
+    choice: NexusGenRootTypes['Choice'] | null; // Choice
+    id: number | null; // Int
+    question: NexusGenRootTypes['Question'] | null; // Question
+    response: NexusGenRootTypes['Response'] | null; // Response
+  }
   Choice: { // field return type
     correct: boolean | null; // Boolean
     id: number | null; // Int
@@ -95,6 +104,7 @@ export interface NexusGenFieldTypes {
     question: NexusGenRootTypes['Question'] | null; // Question
   }
   Mutation: { // field return type
+    createAnswer: NexusGenRootTypes['Answer'] | null; // Answer
     createChoice: NexusGenRootTypes['Choice'] | null; // Choice
     createDraft: NexusGenRootTypes['Post'] | null; // Post
     createDraftQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
@@ -159,6 +169,12 @@ export interface NexusGenFieldTypes {
 }
 
 export interface NexusGenFieldTypeNames {
+  Answer: { // field return type name
+    choice: 'Choice'
+    id: 'Int'
+    question: 'Question'
+    response: 'Response'
+  }
   Choice: { // field return type name
     correct: 'Boolean'
     id: 'Int'
@@ -166,6 +182,7 @@ export interface NexusGenFieldTypeNames {
     question: 'Question'
   }
   Mutation: { // field return type name
+    createAnswer: 'Answer'
     createChoice: 'Choice'
     createDraft: 'Post'
     createDraftQuiz: 'Quiz'
@@ -231,6 +248,11 @@ export interface NexusGenFieldTypeNames {
 
 export interface NexusGenArgTypes {
   Mutation: {
+    createAnswer: { // args
+      choiceId: string; // String!
+      questionId: string; // String!
+      responseId: string; // String!
+    }
     createChoice: { // args
       correct?: boolean | null; // Boolean
       name: string; // String!
