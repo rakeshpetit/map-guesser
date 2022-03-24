@@ -137,7 +137,7 @@ const Response = objectType({
   name: "Response",
   definition(t) {
     t.int("id")
-    t.nullable.field("author", {
+    t.nullable.field("player", {
       type: "User",
       resolve: parent =>
         prisma.response
@@ -154,6 +154,13 @@ const Response = objectType({
             where: { id: Number(parent.id) },
           })
           .quiz(),
+    })
+    t.list.field("answers", {
+      type: "Answer",
+      resolve: parent =>
+        prisma.answer.findMany({
+          where: { responseId: Number(parent.id) },
+        }),
     })
   },
 })
@@ -188,6 +195,37 @@ const Answer = objectType({
             where: { id: Number(parent.id) },
           })
           .choice(),
+    })
+  },
+})
+
+const QuestionScore = objectType({
+  name: "QuestionScore",
+  definition(t) {
+    t.int("questionId")
+    t.nullable.boolean("correctAnswer")
+    t.nullable.boolean("answered")
+  },
+})
+const Player = objectType({
+  name: "Player",
+  definition(t) {
+    t.field("player", {
+      type: User,
+    })
+    t.int("score")
+    t.list.field("questionScores", {
+      type: QuestionScore,
+    })
+  },
+})
+
+const Statistics = objectType({
+  name: "Statistics",
+  definition(t) {
+    t.string("playersCount")
+    t.list.field("players", {
+      type: Player,
     })
   },
 })
@@ -305,6 +343,72 @@ const Query = objectType({
         return prisma.answer.findMany({
           where: { responseId: Number(args.responseId) },
         })
+      },
+    })
+
+    t.field("statistics", {
+      type: "Statistics",
+      args: {
+        quizId: nonNull(stringArg()),
+      },
+      resolve: async (_, args) => {
+        const responses = await prisma.response.findMany({
+          where: { quizId: Number(args.quizId) },
+          include: { author: true, Answer: true },
+        })
+        const questions = await prisma.question.findMany({
+          where: { quizId: Number(args.quizId) },
+          include: { choices: true },
+        })
+
+        const correctAnswers = questions.reduce((answerObj, question) => {
+          const correctChoice = question.choices.find(choice => choice.correct)
+          if (correctChoice) {
+            return { ...answerObj, [question.id]: correctChoice.id }
+          }
+        }, {})
+
+        let count = 0
+        const players = responses.reduce((playerObj, response) => {
+          const { author, Answer: answers, ...info } = response
+          let score = 0
+          const questionScores = questions.reduce((scoresArr, question) => {
+            const currentAnswer = answers.find(
+              answer => answer.questionId === question.id
+            )
+
+            const correctAnswer =
+              correctAnswers[question.id] === currentAnswer?.choiceId
+            if (correctAnswer) {
+              score = score + question.points
+            }
+            if (currentAnswer) {
+              scoresArr.push({
+                questionId: question.id,
+                answered: true,
+                correctAnswer,
+              })
+            } else {
+              scoresArr.push({
+                questionId: question.id,
+                answered: false,
+              })
+            }
+            return scoresArr
+          }, [])
+          playerObj.push({
+            player: response.author,
+            score,
+            questionScores,
+          })
+          count += 1
+          return playerObj
+        }, [])
+
+        return {
+          playersCount: `${count}`,
+          players,
+        }
       },
     })
   },
@@ -654,6 +758,7 @@ export const schema = makeSchema({
     Choice,
     Response,
     Answer,
+    Statistics,
     GQLDate,
   ],
   outputs: {
