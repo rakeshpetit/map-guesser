@@ -9,21 +9,10 @@ const QuizQuery = gql`
     quiz(quizId: $quizId) {
       id
       title
-      secret
       published
       author {
         id
         name
-      }
-      questions {
-        id
-        title
-        points
-        choices {
-          id
-          name
-          correct
-        }
       }
     }
   }
