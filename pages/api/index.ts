@@ -385,6 +385,7 @@ const Query = objectType({
             if (currentAnswer) {
               scoresArr.push({
                 questionId: question.id,
+                answered: true,
                 correctAnswer,
               })
             } else {
