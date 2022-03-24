@@ -372,30 +372,32 @@ const Query = objectType({
         const players = responses.reduce((playerObj, response) => {
           const { author, Answer: answers, ...info } = response
           let score = 0
-          const questionScores = questions.reduce((scoresArr, question) => {
-            const currentAnswer = answers.find(
-              answer => answer.questionId === question.id
-            )
+          const questionScores = questions
+            .reduce((scoresArr, question) => {
+              const currentAnswer = answers.find(
+                answer => answer.questionId === question.id
+              )
 
-            const correctAnswer =
-              correctAnswers[question.id] === currentAnswer?.choiceId
-            if (correctAnswer) {
-              score = score + question.points
-            }
-            if (currentAnswer) {
-              scoresArr.push({
-                questionId: question.id,
-                answered: true,
-                correctAnswer,
-              })
-            } else {
-              scoresArr.push({
-                questionId: question.id,
-                answered: false,
-              })
-            }
-            return scoresArr
-          }, [])
+              const correctAnswer =
+                correctAnswers[question.id] === currentAnswer?.choiceId
+              if (correctAnswer) {
+                score = score + question.points
+              }
+              if (currentAnswer) {
+                scoresArr.push({
+                  questionId: question.id,
+                  answered: true,
+                  correctAnswer,
+                })
+              } else {
+                scoresArr.push({
+                  questionId: question.id,
+                  answered: false,
+                })
+              }
+              return scoresArr
+            }, [])
+            .sort((a, b) => a.questionId - b.questionId)
           playerObj.push({
             player: response.author,
             score,
