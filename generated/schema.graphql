@@ -40,6 +40,12 @@ type Mutation {
   updateQuiz(quizId: String!, secret: String, title: String): Quiz
 }
 
+type Player {
+  player: User
+  questionScores: [QuestionScore]
+  score: Int
+}
+
 type Post {
   author: User
   content: String
@@ -59,6 +65,7 @@ type Query {
   quiz(quizId: String!): Quiz
   quizes: [Quiz]
   response(responseId: String!): Response
+  statistics(quizId: String!): Statistics
 }
 
 type Question {
@@ -67,6 +74,12 @@ type Question {
   points: Int
   quiz: Quiz
   title: String
+}
+
+type QuestionScore {
+  answered: Boolean
+  correctAnswer: Boolean
+  questionId: Int
 }
 
 type Quiz {
@@ -80,9 +93,15 @@ type Quiz {
 }
 
 type Response {
-  author: User
+  answers: [Answer]
   id: Int
+  player: User
   quiz: Quiz
+}
+
+type Statistics {
+  players: [Player]
+  playersCount: String
 }
 
 type User {

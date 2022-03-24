@@ -52,6 +52,11 @@ export interface NexusGenObjects {
     name?: string | null; // String
   }
   Mutation: {};
+  Player: { // root type
+    player?: NexusGenRootTypes['User'] | null; // User
+    questionScores?: Array<NexusGenRootTypes['QuestionScore'] | null> | null; // [QuestionScore]
+    score?: number | null; // Int
+  }
   Post: { // root type
     content?: string | null; // String
     id?: number | null; // Int
@@ -64,6 +69,11 @@ export interface NexusGenObjects {
     points?: number | null; // Int
     title?: string | null; // String
   }
+  QuestionScore: { // root type
+    answered?: boolean | null; // Boolean
+    correctAnswer?: boolean | null; // Boolean
+    questionId?: number | null; // Int
+  }
   Quiz: { // root type
     id?: number | null; // Int
     published?: boolean | null; // Boolean
@@ -72,6 +82,10 @@ export interface NexusGenObjects {
   }
   Response: { // root type
     id?: number | null; // Int
+  }
+  Statistics: { // root type
+    players?: Array<NexusGenRootTypes['Player'] | null> | null; // [Player]
+    playersCount?: string | null; // String
   }
   User: { // root type
     email?: string | null; // String
@@ -121,6 +135,11 @@ export interface NexusGenFieldTypes {
     updateQuestion: NexusGenRootTypes['Question'] | null; // Question
     updateQuiz: NexusGenRootTypes['Quiz'] | null; // Quiz
   }
+  Player: { // field return type
+    player: NexusGenRootTypes['User'] | null; // User
+    questionScores: Array<NexusGenRootTypes['QuestionScore'] | null> | null; // [QuestionScore]
+    score: number | null; // Int
+  }
   Post: { // field return type
     author: NexusGenRootTypes['User'] | null; // User
     content: string | null; // String
@@ -139,6 +158,7 @@ export interface NexusGenFieldTypes {
     quiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     quizes: Array<NexusGenRootTypes['Quiz'] | null> | null; // [Quiz]
     response: NexusGenRootTypes['Response'] | null; // Response
+    statistics: NexusGenRootTypes['Statistics'] | null; // Statistics
   }
   Question: { // field return type
     choices: Array<NexusGenRootTypes['Choice'] | null> | null; // [Choice]
@@ -146,6 +166,11 @@ export interface NexusGenFieldTypes {
     points: number | null; // Int
     quiz: NexusGenRootTypes['Quiz'] | null; // Quiz
     title: string | null; // String
+  }
+  QuestionScore: { // field return type
+    answered: boolean | null; // Boolean
+    correctAnswer: boolean | null; // Boolean
+    questionId: number | null; // Int
   }
   Quiz: { // field return type
     author: NexusGenRootTypes['User'] | null; // User
@@ -157,9 +182,14 @@ export interface NexusGenFieldTypes {
     title: string | null; // String
   }
   Response: { // field return type
-    author: NexusGenRootTypes['User'] | null; // User
+    answers: Array<NexusGenRootTypes['Answer'] | null> | null; // [Answer]
     id: number | null; // Int
+    player: NexusGenRootTypes['User'] | null; // User
     quiz: NexusGenRootTypes['Quiz'] | null; // Quiz
+  }
+  Statistics: { // field return type
+    players: Array<NexusGenRootTypes['Player'] | null> | null; // [Player]
+    playersCount: string | null; // String
   }
   User: { // field return type
     email: string | null; // String
@@ -200,6 +230,11 @@ export interface NexusGenFieldTypeNames {
     updateQuestion: 'Question'
     updateQuiz: 'Quiz'
   }
+  Player: { // field return type name
+    player: 'User'
+    questionScores: 'QuestionScore'
+    score: 'Int'
+  }
   Post: { // field return type name
     author: 'User'
     content: 'String'
@@ -218,6 +253,7 @@ export interface NexusGenFieldTypeNames {
     quiz: 'Quiz'
     quizes: 'Quiz'
     response: 'Response'
+    statistics: 'Statistics'
   }
   Question: { // field return type name
     choices: 'Choice'
@@ -225,6 +261,11 @@ export interface NexusGenFieldTypeNames {
     points: 'Int'
     quiz: 'Quiz'
     title: 'String'
+  }
+  QuestionScore: { // field return type name
+    answered: 'Boolean'
+    correctAnswer: 'Boolean'
+    questionId: 'Int'
   }
   Quiz: { // field return type name
     author: 'User'
@@ -236,9 +277,14 @@ export interface NexusGenFieldTypeNames {
     title: 'String'
   }
   Response: { // field return type name
-    author: 'User'
+    answers: 'Answer'
     id: 'Int'
+    player: 'User'
     quiz: 'Quiz'
+  }
+  Statistics: { // field return type name
+    players: 'Player'
+    playersCount: 'String'
   }
   User: { // field return type name
     email: 'String'
@@ -336,6 +382,9 @@ export interface NexusGenArgTypes {
     }
     response: { // args
       responseId: string; // String!
+    }
+    statistics: { // args
+      quizId: string; // String!
     }
   }
 }
